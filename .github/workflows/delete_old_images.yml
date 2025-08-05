@@ -1,24 +1,23 @@
-name: Delete Very Recent Images
+name: Delete Old Images
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'  # كل 5 دقائق
+  workflow_dispatch:       # إمكانية التشغيل اليدوي
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Delete images older than 5 minutes
-        run: |
-          find ./images -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' -o -name '*.gif' \) -mmin +5 -print -delete
+      - run: |
+          echo "Deleting old files from images/"
+          find images/ -type f -mmin +5 -print -delete
 
-      - name: Commit deleted images
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -u
-          git commit -m "Delete images older than 5 minutes" || echo "No changes to commit"
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -u               # stage deletions والتعديلات
+          git commit -m "Auto delete images older than 5 minutes" || echo "No changes to commit"
           git push
