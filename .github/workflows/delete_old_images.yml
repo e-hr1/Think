@@ -1,33 +1,26 @@
-name: Delete Old Images
+name: Delete images older than 5 minutes
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-  workflow_dispatch:
+    - cron: '*/5 * * * *'  # تشغيل كل 5 دقائق
+  workflow_dispatch:        # لتشغيل يدوي أيضًا
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Delete old image files
+      - name: Delete old images
         run: |
-          echo "🧹 حذف الصور الأقدم من 5 دقائق..."
-          find images/ -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.gif" -o -iname "*.webp" -o -iname "*.bmp" \) -mmin +5 -print -delete
+          find images/ -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.gif' -o -iname '*.webp' -o -iname '*.bmp' \) -mmin +5 -print -delete
 
-      - name: Configure git
+      - name: Commit and push changes
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Commit and push if changes
-        run: |
-          git add images/
-          if git diff --cached --quiet; then
-            echo "✅ لا توجد صور لحذفها"
-          else
-            git commit -m "حذف الصور الأقدم من 5 دقائق"
-            git push
-          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Auto delete images older than 5 minutes"
+          git push
+        continue-on-error: true  # حتى لا يفشل لو لم يكن هناك صور تُحذف
