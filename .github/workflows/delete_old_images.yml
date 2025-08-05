@@ -1,27 +1,33 @@
-name: Delete Old Images
+name: Auto Delete Old Images
 
 on:
   schedule:
     - cron: '*/5 * * * *'  # كل 5 دقائق
-  workflow_dispatch:
+  workflow_dispatch:        # تشغيل يدوي
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      # الخطوة 1: تحميل الريبو
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # لضمان الحصول على تاريخ التعديل الكامل للملفات
-      
-      - name: Delete old images
+          fetch-depth: 0    # مهم لرؤية تواريخ الملفات
+          token: ${{ secrets.CLEANUP_TOKEN }}
+
+      # الخطوة 2: حذف الصور القديمة
+      - name: Remove old images
         run: |
-          echo "Deleting old files from images/"
-          find images/ -type f -mmin +5 -print -delete
-          
-      - name: Commit and push changes
+          echo "📁 Cleaning up images older than 5 minutes..."
+          find images/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -mmin +5 -print -delete
+          echo "✅ Done!"
+
+      # الخطوة 3: حفظ التغييرات
+      - name: Commit changes
+        if: success()
         run: |
-          git config user.name "github-actions"
+          git config user.name "GitHub Cleanup Bot"
           git config user.email "actions@github.com"
           git add images/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto delete images older than 5 minutes"
-          git push
+          git diff --quiet || (git commit -m "🔄 Auto-delete: Removed old images" && git push)
