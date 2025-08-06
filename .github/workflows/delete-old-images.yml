@@ -1,33 +1,26 @@
-name: Auto Delete Old Images
+- name: Remove old images based on git history
+  run: |
+    echo "📁 Checking image ages based on git log..."
 
-on:
-  schedule:
-    - cron: '*/5 * * * *'  # كل 5 دقائق
-  workflow_dispatch:        # تشغيل يدوي
+    current_time=$(date +%s)
+    threshold_minutes=5
+    threshold_seconds=$((threshold_minutes * 60))
 
-jobs:
-  cleanup:
-    runs-on: ubuntu-latest
-    steps:
-      # الخطوة 1: تحميل الريبو
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.CLEANUP_TOKEN }}
+    for file in $(find images/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \)); do
+      last_commit_time=$(git log -1 --format="%ct" -- "$file")
+      if [ -z "$last_commit_time" ]; then
+        echo "⚠️ No commit found for $file, skipping..."
+        continue
+      fi
 
-      # الخطوة 2: حذف الصور القديمة
-      - name: Remove old images
-        run: |
-          echo "📁 Cleaning up images older than 5 minutes..."
-          find images/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -mmin +5 -print -delete
-          echo "✅ Done!"
+      age=$((current_time - last_commit_time))
 
-      # الخطوة 3: حفظ التغييرات
-      - name: Commit changes
-        if: success()
-        run: |
-          git config user.name "GitHub Cleanup Bot"
-          git config user.email "actions@github.com"
-          git add images/
-          git diff --quiet || (git commit -m "🔄 Auto-delete: Removed old images" && git push)
+      if [ "$age" -gt "$threshold_seconds" ]; then
+        echo "🗑️ Deleting $file (Age: $((age / 60)) minutes)"
+        rm "$file"
+      else
+        echo "⏳ Keeping $file (Age: $((age / 60)) minutes)"
+      fi
+    done
+
+    echo "✅ Cleanup complete."
