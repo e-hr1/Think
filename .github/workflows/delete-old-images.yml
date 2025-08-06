@@ -2,33 +2,34 @@ name: Auto Delete Old Images
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # كل 5 دقائق
-  workflow_dispatch:        # لتشغيل يدويًا من واجهة GitHub
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
 
     env:
-      GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}  # تأكد أن هذا التوكن له صلاحيات الكتابة على المستودع
+      GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: 📁 Checking image ages based on git log and deleting old ones
+      - name: Delete old images (based on file mod time)
         run: |
-          echo "📁 Checking image ages based on git log..."
+          echo "🔍 Checking images by file modified time..."
           deleted_any=false
-          
+
           for file in images/*.{jpg,jpeg,png}; do
-            [ -e "$file" ] || continue  # تخطى إذا لم يكن هناك ملفات
-            last_commit_date=$(git log -1 --format="%ct" -- "$file" || echo 0)
+            [ -e "$file" ] || continue
+            mod_time=$(date -r "$file" +%s)
             now=$(date +%s)
-            age_minutes=$(( (now - last_commit_date) / 60 ))
+            age_minutes=$(( (now - mod_time) / 60 ))
 
             if [ "$age_minutes" -gt 5 ]; then
-              echo "🗑️ Deleting $file (Age: $age_minutes minutes)"
+              echo "🗑️ Deleting $file (Age: $age_minutes min)"
+              rm "$file"
               git rm "$file"
               deleted_any=true
             fi
