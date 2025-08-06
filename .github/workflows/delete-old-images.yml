@@ -3,53 +3,42 @@ name: Auto Delete Old Images
 on:
   schedule:
     - cron: '*/5 * * * *'  # كل 5 دقائق
-  workflow_dispatch:        # تشغيل يدوي
+  workflow_dispatch:        # لتشغيل يدويًا من واجهة GitHub
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
 
-    steps:
-      # 🧱 تحميل المستودع
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # ضروري لقراءة سجل git الكامل
-          token: ${{ secrets.CLEANUP_TOKEN }}
+    env:
+      GH_TOKEN: ${{ secrets.CLEANUP_TOKEN }}  # تأكد أن هذا التوكن له صلاحيات الكتابة على المستودع
 
-      # 🧹 حذف الصور القديمة بناءً على تاريخ آخر commit
-      - name: Remove old images based on git history
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 📁 Checking image ages based on git log and deleting old ones
         run: |
           echo "📁 Checking image ages based on git log..."
+          deleted_any=false
+          
+          for file in images/*.{jpg,jpeg,png}; do
+            [ -e "$file" ] || continue  # تخطى إذا لم يكن هناك ملفات
+            last_commit_date=$(git log -1 --format="%ct" -- "$file" || echo 0)
+            now=$(date +%s)
+            age_minutes=$(( (now - last_commit_date) / 60 ))
 
-          current_time=$(date +%s)
-          threshold_minutes=5
-          threshold_seconds=$((threshold_minutes * 60))
-
-          for file in $(find images/ -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \)); do
-            last_commit_time=$(git log -1 --format="%ct" -- "$file")
-            if [ -z "$last_commit_time" ]; then
-              echo "⚠️ No commit found for $file, skipping..."
-              continue
-            fi
-
-            age=$((current_time - last_commit_time))
-
-            if [ "$age" -gt "$threshold_seconds" ]; then
-              echo "🗑️ Deleting $file (Age: $((age / 60)) minutes)"
-              rm "$file"
-            else
-              echo "⏳ Keeping $file (Age: $((age / 60)) minutes)"
+            if [ "$age_minutes" -gt 5 ]; then
+              echo "🗑️ Deleting $file (Age: $age_minutes minutes)"
+              git rm "$file"
+              deleted_any=true
             fi
           done
 
-          echo "✅ Cleanup complete."
-
-      # 💾 رفع التغييرات إن وُجدت
-      - name: Commit changes
-        if: success()
-        run: |
-          git config user.name "GitHub Cleanup Bot"
-          git config user.email "actions@github.com"
-          git add images/
-          git diff --quiet || (git commit -m "🔄 Auto-delete: Removed old images" && git push)
+          if [ "$deleted_any" = true ]; then
+            git config user.name "GitHub Cleanup Bot"
+            git config user.email "bot@example.com"
+            git commit -m "🧹 حذف الصور القديمة تلقائيًا"
+            git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
+          else
+            echo "✅ No old images found to delete."
+          fi
