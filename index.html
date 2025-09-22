@@ -2,38 +2,36 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>عرض المحادثة</title>
     <!-- جلب مكتبة Marked لتحويل Markdown إلى HTML -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
             /* --- الوضع الفاتح (Light Mode) --- */
-            --bg-color: #f0f2f5;
-            --text-color: #050505;
-            --container-bg: #ffffff;
-            --container-border: #e0e0e0;
-            --header-bg: #f5f6f7;
-            --header-border: #ddd;
-            --bot-bubble-bg: #e4e6eb;
+            --bg-color: #FFFFFF; /* scaffoldBackgroundColor */
+            --text-color: #000000; /* bodyLarge color */
+            --container-bg: #FFFFFF;
+            --header-bg: #FFFFFF; /* appBarTheme background */
+            --header-border: #e0e0e0;
+            --bot-bubble-bg: #F8F8F8; /* cardColor */
             --user-bubble-bg: #ECF2FE; /* Color(0xFFECF2FE) */
-            --user-bubble-text: #050505;
+            --user-bubble-text: #000000;
             --timestamp-color: #65676b;
-            --attachment-border: #ddd;
+            --attachment-border: #e0e0e0;
             --welcome-icon-filter: none;
         }
 
         .dark-mode {
             /* --- الوضع الداكن (Dark Mode) --- */
-            --bg-color: #18191a;
-            --text-color: #e4e6eb;
-            --container-bg: #242526;
-            --container-border: #3a3b3c;
-            --header-bg: #3a3b3c;
-            --header-border: #444;
-            --bot-bubble-bg: #3a3b3c;
+            --bg-color: #121212; /* scaffoldBackgroundColor */
+            --text-color: #FFFFFF; /* bodyLarge color */
+            --container-bg: #121212;
+            --header-bg: #121212; /* appBarTheme background */
+            --header-border: #3a3b3c;
+            --bot-bubble-bg: #1E1E1E; /* cardColor */
             --user-bubble-bg: #2A3C5C; /* Color(0xFF2A3C5C) */
-            --user-bubble-text: #e4e6eb;
+            --user-bubble-text: #FFFFFF;
             --timestamp-color: #b0b3b8;
             --attachment-border: #444;
             --welcome-icon-filter: brightness(0) invert(1);
@@ -44,7 +42,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 0; /* إزالة الحشوة من الجسم */
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -53,13 +51,12 @@
 
         .chat-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 800px; /* يمكنك تعديل العرض الأقصى */
             background-color: var(--container-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            height: 100vh; /* جعل الحاوية تملأ الشاشة عمودياً */
+            box-sizing: border-box;
         }
 
         .chat-header {
@@ -68,12 +65,15 @@
             background-color: var(--header-bg);
             text-align: center;
             flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .chat-header h1 {
             margin: 0;
             font-size: 15px; /* مطابق لحجم الخط في AppBar */
-            font-weight: 600;
+            font-weight: bold; /* مطابق للتطبيق */
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -81,14 +81,18 @@
 
         .chat-body {
             flex-grow: 1;
-            padding: 10px 8px; /* تقليل المسافة لتكون أقرب للتطبيق */
+            padding: 8px; /* مطابقة للمسافة في التطبيق */
             overflow-y: auto;
         }
 
         .message {
             display: flex;
-            margin-bottom: 4px; /* تقليل المسافة بين الرسائل */
-            max-width: 90%; /* زيادة العرض الأقصى قليلًا */
+            margin-bottom: 2px; /* vertical: 2 في التطبيق */
+            max-width: 80%; /* maxWidth: 0.80 للمستخدم */
+        }
+        
+        .message.bot {
+             max-width: 100%; /* maxWidth: 1 للبوت */
         }
 
         .message.user {
@@ -117,6 +121,7 @@
             padding: 12px;
             border-radius: 18px;
             line-height: 1.5;
+            font-size: 16px; /* حجم الخط الأساسي للرسائل */
             white-space: pre-wrap;
             word-wrap: break-word;
         }
@@ -137,8 +142,8 @@
         .bubble ul, .bubble ol { margin: 8px 0; padding-right: 20px; }
         .bubble li { margin-bottom: 4px; }
         .bubble a { color: #007bff; text-decoration: underline; }
-        .bubble strong { font-weight: bold; }
-        .bubble em { font-style: italic; }
+        .bubble strong, .bubble b { font-weight: bold; }
+        .bubble em, .bubble i { font-style: italic; }
         .bubble code {
             font-family: 'monospace';
             background-color: rgba(0,0,0,0.05);
@@ -149,22 +154,15 @@
              background-color: rgba(255,255,255,0.1);
         }
 
-        .timestamp {
-            font-size: 0.75em;
-            color: var(--timestamp-color);
-            padding: 4px 12px;
-        }
-
         .status-message, .welcome-screen {
             text-align: center;
             padding: 60px 20px;
             color: var(--timestamp-color);
-            font-size: 1.1em;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            height: 80%;
         }
         .welcome-screen img {
             width: 100px;
@@ -186,11 +184,15 @@
 
         /* --- تنسيق المرفقات --- */
         .attachments-container {
-            padding: 0 12px;
-            margin-top: 8px;
+            margin-bottom: 8px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px; /* margin: const EdgeInsets.only(top: 6) */
+            align-items: flex-end; /* لمحاذاة العناصر لليمين في حالة المستخدم */
+        }
+        
+        .message.bot .attachments-container {
+            align-items: flex-start;
         }
 
         .message-images {
@@ -200,17 +202,24 @@
             max-width: 250px; /* مطابق للتطبيق */
         }
         .message-images img {
-            width: 120px; /* حجم تقريبي */
-            height: 120px;
+            max-width: 100%;
+            height: auto;
             object-fit: cover;
             border-radius: 16px; /* مطابق للتطبيق */
             border: 0.5px solid var(--attachment-border);
-            cursor: pointer;
-            transition: transform 0.2s;
+            cursor: default; /* تغيير المؤشر ليدل على عدم إمكانية النقر */
+            pointer-events: none; /* منع أي تفاعل مع الصورة */
         }
-        .message-images img:hover {
-            transform: scale(1.05);
-        }
+        
+        /* تخطيطات الصور المختلفة */
+        .image-layout-1 img { width: 250px; height: 204px; }
+        .image-layout-2 { display: flex; flex-direction: row; width: 250px; }
+        .image-layout-2 img { flex: 1; height: 120px; }
+        .image-layout-3 { display: flex; flex-direction: column; width: 250px; gap: 4px; }
+        .image-layout-3 .row1 { display: flex; gap: 4px; }
+        .image-layout-3 .row1 img { flex: 1; height: 100px; }
+        .image-layout-3 .row2 img { width: 100%; height: 120px; }
+
 
         .file-attachment {
             display: flex;
@@ -225,6 +234,7 @@
             width: 40px; /* مطابق للتطبيق */
             height: 40px;
             margin-left: 8px;
+            pointer-events: none; /* منع التفاعل مع الأيقونة */
         }
         .file-info {
             overflow: hidden;
@@ -256,9 +266,61 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const username = "e-hr1";
-            const repo = "Think";
-            const branch = "main";
+            // بيانات وهمية للمثال
+            const conversation = {
+                title: "محادثة تجريبية حول Flutter",
+                messages: [
+                    {
+                        isUser: true,
+                        text: "مرحباً، هل يمكنك تزويدي بمثال لعرض الصور والملفات في Flutter؟",
+                        timestamp: "2025-09-23T10:00:00Z",
+                        imageUrls: [],
+                        attachedFiles: []
+                    },
+                    {
+                        isUser: false,
+                        text: "بالتأكيد! يمكنك استخدام `Image.file` للصور المحلية و `Image.network` للصور من الإنترنت. بالنسبة للملفات، يمكنك تصميم واجهة مخصصة لعرضها.",
+                        timestamp: "2025-09-23T10:01:00Z",
+                        imageUrls: [],
+                        attachedFiles: []
+                    },
+                    {
+                        isUser: true,
+                        text: "ممتاز، لقد قمت بإرفاق بعض الأمثلة. هذه صورة لواجهة المستخدم، ملف PDF للمواصفات، وملف Word للتوثيق.",
+                        timestamp: "2025-09-23T10:02:00Z",
+                        imageUrls: ["https://via.placeholder.com/250x204.png/ECF2FE/000000?text=UI+Screenshot"],
+                        attachedFiles: [
+                            { name: "specs.pdf", size: "1.2 MB", type: "pdf" },
+                            { name: "documentation.docx", size: "450 KB", type: "word" }
+                        ]
+                    },
+                    {
+                        isUser: false,
+                        text: "رائع! التصميم يبدو نظيفًا. إليك مثال على كود برمجي لعرض قائمة:\n\n```dart\nListView.builder(\n  itemCount: items.length,\n  itemBuilder: (context, index) {\n    return ListTile(\n      title: Text(items[index]),\n    );\n  },\n);\n```",
+                        timestamp: "2025-09-23T10:03:00Z",
+                        imageUrls: [],
+                        attachedFiles: []
+                    },
+                    {
+                        isUser: true,
+                        text: "شكرًا لك! سأجرب هذا الكود. أرفقت صورتين إضافيتين.",
+                        timestamp: "2025-09-23T10:04:00Z",
+                        imageUrls: ["https://via.placeholder.com/120x120.png/ECF2FE/000000?text=Img+1", "https://via.placeholder.com/120x120.png/ECF2FE/000000?text=Img+2"],
+                        attachedFiles: []
+                    },
+                    {
+                        isUser: true,
+                        text: "", // رسالة فارغة مع مرفقات فقط
+                        timestamp: "2025-09-23T10:05:00Z",
+                        imageUrls: [],
+                        attachedFiles: [
+                            { name: "main.dart", size: "15 KB", type: "code" },
+                            { name: "archive.zip", size: "2.5 MB", type: "zip" }
+                        ]
+                    }
+                ]
+            };
+
             const chatBody = document.getElementById('chat-body');
             const chatTitle = document.getElementById('chat-title');
 
@@ -266,138 +328,117 @@
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.body.classList.add('dark-mode');
             }
-
-            const params = new URLSearchParams(window.location.search);
-            const chatId = params.get('id');
-
-            if (!chatId) {
-                displayWelcomeScreen();
-                return;
-            }
-
-            chatBody.innerHTML = `<div class="status-message"><p>جاري تحميل المحادثة...</p></div>`;
             
-            const filePath = `public/chats/${chatId}.json`;
-            const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
-
-            fetch(fileUrl)
-                .then(r => !r.ok ? new Promise(res => setTimeout(res, 1500)).then(() => fetch(fileUrl + '?t=' + new Date().getTime())) : r)
-                .then(r => { if (!r.ok) throw new Error(`فشل في العثور على المحادثة (الكود: ${r.status}).`); return r.json(); })
-                .then(conversation => displayConversation(conversation))
-                .catch(error => {
-                    console.error(error);
-                    chatBody.innerHTML = `<div class="status-message"><p>حدث خطأ أثناء تحميل المحادثة.</p><p>${error.message}</p></div>`;
-                });
-        });
-
-        function displayWelcomeScreen() {
-            const chatBody = document.getElementById('chat-body');
-            const iconUrl = `https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icon_thinkapp.png`;
-            chatBody.innerHTML = `
-                <div class="welcome-screen">
-                    <img src="${iconUrl}" alt="Think AI Logo">
-                    <h2>كيف يمكنني مساعدتك اليوم؟</h2>
-                    <p>ابدأ محادثة جديدة من التطبيق وشاركها لعرضها هنا.</p>
-                </div>`;
-        }
-
-        function displayConversation(conversation) {
-            const chatTitle = document.getElementById('chat-title');
-            const chatBody = document.getElementById('chat-body');
-            chatTitle.textContent = conversation.title || 'محادثة';
-            chatBody.innerHTML = '';
-
-            if (!conversation.messages || conversation.messages.length === 0) {
-                displayWelcomeScreen();
-                return;
-            }
-
-            const username = "e-hr1";
-            const repo = "Think";
-            const branch = "main";
+            // الاستماع لتغيرات الوضع الليلي
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (event.matches) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            });
 
             function getIconUrl(fileType) {
                 const iconMap = {
-                    'pdf': 'icon_file_pdf.png', 'word': 'icon_word.png', 'excel': 'icon_exel.png',
-                    'pptx': 'icon_pptx.png', 'txt': 'icon_txt.png', 'code': 'icon_file_code.png'
+                    'pdf': 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_file_pdf.png',
+                    'word': 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_word.png',
+                    'excel': 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_exel.png',
+                    'pptx': 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_pptx.png',
+                    'txt': 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_txt.png',
+                    'code': 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_file_code.png'
                 };
-                const iconName = iconMap[fileType] || 'icon_file_code.png';
-                return `https://raw.githubusercontent.com/${username}/${repo}/${branch}/public/assets/icons/${iconName}`;
+                // أيقونة افتراضية للملفات غير المعروفة
+                return iconMap[fileType] || 'https://raw.githubusercontent.com/e-hr1/Think/main/assets/icon_file_code.png';
             }
 
-            conversation.messages.forEach(msg => {
-                // تجاهل الرسائل الفارغة تمامًا
-                if (!msg.text && (!msg.imageUrls || msg.imageUrls.length === 0) && (!msg.attachedFiles || msg.attachedFiles.length === 0)) {
+            function displayConversation(conv) {
+                chatTitle.textContent = conv.title || 'محادثة';
+                chatBody.innerHTML = '';
+
+                if (!conv.messages || conv.messages.length === 0) {
+                    chatBody.innerHTML = `<div class="welcome-screen">...</div>`; // شاشة ترحيب
                     return;
                 }
 
-                const messageEl = document.createElement('div');
-                messageEl.className = `message ${msg.isUser ? 'user' : 'bot'}`;
+                conv.messages.forEach(msg => {
+                    // تجاهل الرسائل الفارغة تمامًا
+                    if (!msg.text && (!msg.imageUrls || msg.imageUrls.length === 0) && (!msg.attachedFiles || msg.attachedFiles.length === 0)) {
+                        return;
+                    }
 
-                const wrapperEl = document.createElement('div');
-                wrapperEl.className = 'message-wrapper';
+                    const messageEl = document.createElement('div');
+                    messageEl.className = `message ${msg.isUser ? 'user' : 'bot'}`;
 
-                const attachmentsEl = document.createElement('div');
-                attachmentsEl.className = 'attachments-container';
+                    const wrapperEl = document.createElement('div');
+                    wrapperEl.className = 'message-wrapper';
 
-                // عرض الصور
-                if (msg.imageUrls && msg.imageUrls.length > 0) {
-                    const imagesContainer = document.createElement('div');
-                    imagesContainer.className = 'message-images';
-                    if (msg.isUser) { imagesContainer.style.justifyContent = 'flex-end'; }
-                    msg.imageUrls.forEach(url => {
-                        const img = document.createElement('img');
-                        img.src = url;
-                        img.alt = 'صورة مرفقة';
-                        img.onclick = () => window.open(url, '_blank');
-                        imagesContainer.appendChild(img);
-                    });
-                    attachmentsEl.appendChild(imagesContainer);
-                }
+                    const attachmentsEl = document.createElement('div');
+                    attachmentsEl.className = 'attachments-container';
 
-                // عرض الملفات
-                if (msg.attachedFiles && msg.attachedFiles.length > 0) {
-                    msg.attachedFiles.forEach(file => {
-                        const fileDiv = document.createElement('div');
-                        fileDiv.className = 'file-attachment';
-                        fileDiv.innerHTML = `
-                            <img src="${getIconUrl(file.type)}" alt="${file.type} icon">
-                            <div class="file-info">
-                                <div class="name">${file.name}</div>
-                                <div class="size">${file.size}</div>
-                            </div>`;
-                        attachmentsEl.appendChild(fileDiv);
-                    });
-                }
-                
-                // إضافة المرفقات قبل النص للمستخدم، وبعده للبوت (للمحاكاة)
-                if (msg.isUser) {
+                    // عرض الصور
+                    if (msg.imageUrls && msg.imageUrls.length > 0) {
+                        const imagesContainer = document.createElement('div');
+                        const count = msg.imageUrls.length;
+                        imagesContainer.className = `message-images image-layout-${count}`;
+                        
+                        if (count === 3) {
+                            imagesContainer.innerHTML = `
+                                <div class="row1">
+                                    <img src="${msg.imageUrls[0]}" alt="صورة مرفقة 1">
+                                    <img src="${msg.imageUrls[1]}" alt="صورة مرفقة 2">
+                                </div>
+                                <div class="row2">
+                                    <img src="${msg.imageUrls[2]}" alt="صورة مرفقة 3">
+                                </div>
+                            `;
+                        } else {
+                            msg.imageUrls.forEach((url, index) => {
+                                const img = document.createElement('img');
+                                img.src = url;
+                                img.alt = `صورة مرفقة ${index + 1}`;
+                                imagesContainer.appendChild(img);
+                            });
+                        }
+                        attachmentsEl.appendChild(imagesContainer);
+                    }
+
+                    // عرض الملفات
+                    if (msg.attachedFiles && msg.attachedFiles.length > 0) {
+                        msg.attachedFiles.forEach(file => {
+                            const fileDiv = document.createElement('div');
+                            fileDiv.className = 'file-attachment';
+                            fileDiv.innerHTML = `
+                                <img src="${getIconUrl(file.type)}" alt="${file.type} icon">
+                                <div class="file-info">
+                                    <div class="name">${file.name}</div>
+                                    <div class="size">${file.size}</div>
+                                </div>`;
+                            attachmentsEl.appendChild(fileDiv);
+                        });
+                    }
+                    
                     wrapperEl.appendChild(attachmentsEl);
-                }
 
-                // عرض النص
-                if (msg.text && msg.text.trim() !== '') {
-                    const bubbleEl = document.createElement('div');
-                    bubbleEl.className = 'bubble';
-                    // استخدام مكتبة marked لتحويل النص
-                    bubbleEl.innerHTML = marked.parse(msg.text);
-                    wrapperEl.appendChild(bubbleEl);
-                }
+                    // عرض النص
+                    if (msg.text && msg.text.trim() !== '') {
+                        const bubbleEl = document.createElement('div');
+                        bubbleEl.className = 'bubble';
+                        // استخدام مكتبة marked لتحويل النص
+                        bubbleEl.innerHTML = marked.parse(msg.text);
+                        wrapperEl.appendChild(bubbleEl);
+                    }
+
+                    messageEl.appendChild(wrapperEl);
+                    chatBody.appendChild(messageEl);
+                });
                 
-                if (!msg.isUser) {
-                     wrapperEl.appendChild(attachmentsEl);
-                }
+                // التمرير لأسفل لعرض آخر رسالة
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
 
-                // عرض الوقت
-                const timestampEl = document.createElement('div');
-                timestampEl.className = 'timestamp';
-                timestampEl.textContent = new Date(msg.timestamp).toLocaleString('ar-SA', { hour: 'numeric', minute: 'numeric', hour12: true });
-                wrapperEl.appendChild(timestampEl);
-
-                messageEl.appendChild(wrapperEl);
-                chatBody.appendChild(messageEl);
-            });
-        }
+            // عرض المحادثة عند تحميل الصفحة
+            displayConversation(conversation);
+        });
     </script>
 </body>
 </html>
