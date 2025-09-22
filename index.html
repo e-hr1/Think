@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عرض المحادثة</title>
     <style>
-        /* نفس كود الـ CSS السابق بدون تغيير */
+        /* CSS remains the same */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f0f2f5;
@@ -61,7 +61,7 @@
             padding: 10px 15px;
             border-radius: 18px;
             line-height: 1.5;
-            white-space: pre-wrap; /* لعرض الأسطر الجديدة بشكل صحيح */
+            white-space: pre-wrap;
         }
         .message.user {
             margin-left: auto;
@@ -129,36 +129,43 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // التحقق من الوضع الليلي
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.body.classList.add('dark-mode');
             }
 
-            // --- 1. قراءة المعرّف الفريد من رابط الصفحة ---
             const params = new URLSearchParams(window.location.search);
             const chatId = params.get('id');
-
             const statusMessage = document.getElementById('status-message');
 
             if (!chatId) {
-                statusMessage.innerHTML = `<p>خطأ: رابط المشاركة غير صالح أو ناقص.</p><p>يرجى التأكد من أن الرابط يحتوي على معرّف المحادثة (مثال: ?id=xxxx).</p>`;
+                statusMessage.innerHTML = `<p>خطأ: رابط المشاركة غير صالح أو ناقص.</p>`;
                 return;
             }
 
             // معلومات المستودع
             const username = "e-hr1";
             const repo = "Think";
-            // --- 2. بناء مسار الملف باستخدام المعرّف ---
+            const branch = "main"; // أو "master" حسب اسم الفرع الرئيسي لديك
             const filePath = `public/chats/${chatId}.json`;
             
-            // رابط GitHub Pages للوصول للملفات مباشرة
-            const fileUrl = `https://${username}.github.io/${repo}/${filePath}`;
+            // ✅ *** التعديل الرئيسي هنا ***
+            // بناء الرابط باستخدام نطاق المحتوى الخام لـ GitHub
+            const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
 
-            // --- 3. جلب الملف مباشرة من رابط GitHub Pages ---
+            // جلب الملف باستخدام الرابط المصحح
             fetch(fileUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`فشل في العثور على المحادثة. قد تكون حُذفت أو أن الرابط غير صحيح.`);
+                        // إضافة تأخير بسيط قبل إعادة المحاولة لتجنب مشاكل التخزين المؤقت
+                        return new Promise(resolve => setTimeout(resolve, 1500)).then(() => {
+                            return fetch(fileUrl + '?t=' + new Date().getTime()); // إضافة معلمة لمنع التخزين المؤقت
+                        });
+                    }
+                    return response;
+                })
+                .then(response => {
+                    if (!response.ok) {
+                         throw new Error(`فشل في العثور على المحادثة (الكود: ${response.status}). قد تكون حُذفت أو أن الرابط غير صحيح.`);
                     }
                     return response.json();
                 })
@@ -171,12 +178,13 @@
                 });
         });
 
+        // دالة displayConversation تبقى كما هي بدون تغيير
         function displayConversation(conversation) {
             const chatTitle = document.getElementById('chat-title');
             const chatBody = document.getElementById('chat-body');
 
             chatTitle.textContent = conversation.title || 'محادثة';
-            chatBody.innerHTML = ''; // مسح رسالة التحميل
+            chatBody.innerHTML = '';
 
             if (!conversation.messages || conversation.messages.length === 0) {
                 chatBody.innerHTML = `<div class="status-message"><p>هذه المحادثة فارغة.</p></div>`;
