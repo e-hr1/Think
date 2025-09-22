@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عرض المحادثة</title>
     <style>
-        /* CSS remains the same */
+        /* CSS remains the same, with additions for images */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f0f2f5;
@@ -112,6 +112,27 @@
         .dark-mode .status-message {
             color: #b0b3b8;
         }
+        /* ✅ --- CSS جديد للصور --- */
+        .message-images {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .message-images img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .dark-mode .message-images img {
+            border-color: #444;
+        }
+        .message-images img:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -129,6 +150,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ... (الكود الخاص بجلب الملف يبقى كما هو)
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.body.classList.add('dark-mode');
             }
@@ -142,30 +164,25 @@
                 return;
             }
 
-            // معلومات المستودع
             const username = "e-hr1";
             const repo = "Think";
-            const branch = "main"; // أو "master" حسب اسم الفرع الرئيسي لديك
+            const branch = "main";
             const filePath = `public/chats/${chatId}.json`;
             
-            // ✅ *** التعديل الرئيسي هنا ***
-            // بناء الرابط باستخدام نطاق المحتوى الخام لـ GitHub
             const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
 
-            // جلب الملف باستخدام الرابط المصحح
             fetch(fileUrl)
                 .then(response => {
                     if (!response.ok) {
-                        // إضافة تأخير بسيط قبل إعادة المحاولة لتجنب مشاكل التخزين المؤقت
                         return new Promise(resolve => setTimeout(resolve, 1500)).then(() => {
-                            return fetch(fileUrl + '?t=' + new Date().getTime()); // إضافة معلمة لمنع التخزين المؤقت
+                            return fetch(fileUrl + '?t=' + new Date().getTime());
                         });
                     }
                     return response;
                 })
                 .then(response => {
                     if (!response.ok) {
-                         throw new Error(`فشل في العثور على المحادثة (الكود: ${response.status}). قد تكون حُذفت أو أن الرابط غير صحيح.`);
+                         throw new Error(`فشل في العثور على المحادثة (الكود: ${response.status}).`);
                     }
                     return response.json();
                 })
@@ -178,7 +195,7 @@
                 });
         });
 
-        // دالة displayConversation تبقى كما هي بدون تغيير
+        // ✅ *** تعديل دالة عرض المحادثة لدعم الصور ***
         function displayConversation(conversation) {
             const chatTitle = document.getElementById('chat-title');
             const chatBody = document.getElementById('chat-body');
@@ -195,20 +212,45 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message', msg.isUser ? 'user' : 'bot');
 
-                const contentDiv = document.createElement('div');
-                contentDiv.classList.add('message-content');
-                contentDiv.textContent = msg.text;
+                const messageWrapper = document.createElement('div');
+                messageWrapper.style.width = '100%';
 
+                // عرض نص الرسالة (إذا كان موجودًا)
+                if (msg.text && msg.text.trim() !== '') {
+                    const contentDiv = document.createElement('div');
+                    contentDiv.classList.add('message-content');
+                    contentDiv.textContent = msg.text;
+                    messageWrapper.appendChild(contentDiv);
+                }
+
+                // عرض الصور (إذا كانت موجودة)
+                if (msg.imageUrls && msg.imageUrls.length > 0) {
+                    const imagesContainer = document.createElement('div');
+                    imagesContainer.classList.add('message-images');
+                    
+                    // تحديد اتجاه الصور بناءً على المرسل
+                    if (msg.isUser) {
+                        imagesContainer.style.justifyContent = 'flex-end';
+                    }
+
+                    msg.imageUrls.forEach(url => {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.alt = 'صورة مرفقة';
+                        // إضافة خاصية لفتح الصورة في نافذة جديدة عند النقر
+                        img.onclick = () => window.open(url, '_blank');
+                        imagesContainer.appendChild(img);
+                    });
+                    messageWrapper.appendChild(imagesContainer);
+                }
+
+                // عرض الوقت
                 const timestampDiv = document.createElement('div');
                 timestampDiv.classList.add('timestamp');
                 const date = new Date(msg.timestamp);
                 timestampDiv.textContent = date.toLocaleString('ar-SA', { hour: 'numeric', minute: 'numeric', hour12: true });
-
-                const messageWrapper = document.createElement('div');
-                messageWrapper.style.width = '100%';
-
-                messageWrapper.appendChild(contentDiv);
                 messageWrapper.appendChild(timestampDiv);
+
                 messageDiv.appendChild(messageWrapper);
                 chatBody.appendChild(messageDiv);
             });
