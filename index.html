@@ -5,201 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>عرض المحادثة</title>
     <style>
-        /* CSS remains the same, with additions for images */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f0f2f5;
-            color: #1c1e21;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .dark-mode {
-            background-color: #18191a;
-            color: #e4e6eb;
-        }
-        .chat-container {
-            width: 100%;
-            max-width: 800px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .dark-mode .chat-container {
-            background-color: #242526;
-            border: 1px solid #3a3b3c;
-        }
-        .chat-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #ddd;
-            background-color: #f5f6f7;
-            text-align: center;
-        }
-        .dark-mode .chat-header {
-            background-color: #3a3b3c;
-            border-bottom: 1px solid #444;
-        }
-        .chat-header h1 {
-            margin: 0;
-            font-size: 1.2em;
-        }
-        .chat-body {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .message {
-            display: flex;
-            margin-bottom: 15px;
-            max-width: 85%;
-        }
-        .message-content {
-            padding: 10px 15px;
-            border-radius: 18px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-        .message.user {
-            margin-left: auto;
-            flex-direction: row-reverse;
-        }
-        .message.user .message-content {
-            background-color: #0084ff;
-            color: white;
-            border-top-right-radius: 4px;
-        }
-        .dark-mode .message.user .message-content {
-            background-color: #2a3c5c;
-        }
-        .message.bot {
-            margin-right: auto;
-        }
-        .message.bot .message-content {
-            background-color: #e4e6eb;
-            color: #050505;
-            border-top-left-radius: 4px;
-        }
-        .dark-mode .message.bot .message-content {
-            background-color: #3a3b3c;
-            color: #e4e6eb;
-        }
-        .timestamp {
-            font-size: 0.75em;
-            color: #65676b;
-            padding: 5px 0;
-        }
-        .dark-mode .timestamp {
-            color: #b0b3b8;
-        }
-        .message.user .timestamp {
-            text-align: left;
-            padding-left: 10px;
-        }
-        .message.bot .timestamp {
-            text-align: right;
-            padding-right: 10px;
-        }
-        .status-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: #65676b;
-            font-size: 1.1em;
-        }
-        .dark-mode .status-message {
-            color: #b0b3b8;
-        }
-        /* ✅ --- CSS جديد للصور --- */
-        .message-images {
+        /* ... (نفس الـ CSS السابق) ... */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f0f2f5; color: #1c1e21; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .dark-mode { background-color: #18191a; color: #e4e6eb; }
+        .chat-container { width: 100%; max-width: 800px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; overflow: hidden; }
+        .dark-mode .chat-container { background-color: #242526; border: 1px solid #3a3b3c; }
+        .chat-header { padding: 15px 20px; border-bottom: 1px solid #ddd; background-color: #f5f6f7; text-align: center; }
+        .dark-mode .chat-header { background-color: #3a3b3c; border-bottom: 1px solid #444; }
+        .chat-header h1 { margin: 0; font-size: 1.2em; }
+        .chat-body { flex-grow: 1; padding: 20px; overflow-y: auto; }
+        .message { display: flex; margin-bottom: 15px; max-width: 85%; }
+        .message-content { padding: 10px 15px; border-radius: 18px; line-height: 1.5; white-space: pre-wrap; }
+        .message.user { margin-left: auto; flex-direction: row-reverse; }
+        .message.user .message-content { background-color: #0084ff; color: white; border-top-right-radius: 4px; }
+        .dark-mode .message.user .message-content { background-color: #2a3c5c; }
+        .message.bot { margin-right: auto; }
+        .message.bot .message-content { background-color: #e4e6eb; color: #050505; border-top-left-radius: 4px; }
+        .dark-mode .message.bot .message-content { background-color: #3a3b3c; color: #e4e6eb; }
+        .timestamp { font-size: 0.75em; color: #65676b; padding: 5px 0; }
+        .dark-mode .timestamp { color: #b0b3b8; }
+        .message.user .timestamp { text-align: left; padding-left: 10px; }
+        .message.bot .timestamp { text-align: right; padding-right: 10px; }
+        .status-message { text-align: center; padding: 40px 20px; color: #65676b; font-size: 1.1em; }
+        .dark-mode .status-message { color: #b0b3b8; }
+        .message-images { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .message-images img { max-width: 150px; max-height: 150px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.2s; }
+        .dark-mode .message-images img { border-color: #444; }
+        .message-images img:hover { transform: scale(1.05); }
+
+        /* ✅ --- CSS جديد للملفات --- */
+        .message-files {
             margin-top: 8px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
+            flex-direction: column;
+            gap: 8px;
         }
-        .message-images img {
-            max-width: 150px;
-            max-height: 150px;
-            border-radius: 10px;
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 12px;
             border: 1px solid #ddd;
-            cursor: pointer;
-            transition: transform 0.2s;
+            max-width: 250px;
         }
-        .dark-mode .message-images img {
+        .dark-mode .file-attachment {
             border-color: #444;
         }
-        .message-images img:hover {
-            transform: scale(1.05);
+        .file-attachment img {
+            width: 32px;
+            height: 32px;
+            margin-left: 10px;
+        }
+        .file-info {
+            overflow: hidden;
+        }
+        .file-info .name {
+            font-size: 0.9em;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .file-info .size {
+            font-size: 0.75em;
+            color: #65676b;
+        }
+        .dark-mode .file-info .size {
+            color: #b0b3b8;
         }
     </style>
 </head>
 <body>
-
     <div class="chat-container">
-        <div class="chat-header">
-            <h1 id="chat-title">عرض المحادثة</h1>
-        </div>
+        <div class="chat-header"><h1 id="chat-title">عرض المحادثة</h1></div>
         <div class="chat-body" id="chat-body">
-            <div class="status-message" id="status-message">
-                <p>جاري تحميل المحادثة...</p>
-            </div>
+            <div class="status-message" id="status-message"><p>جاري تحميل المحادثة...</p></div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ... (الكود الخاص بجلب الملف يبقى كما هو)
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.classList.add('dark-mode');
-            }
-
+            // ... (كود جلب الملف يبقى كما هو)
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) { document.body.classList.add('dark-mode'); }
             const params = new URLSearchParams(window.location.search);
             const chatId = params.get('id');
             const statusMessage = document.getElementById('status-message');
-
-            if (!chatId) {
-                statusMessage.innerHTML = `<p>خطأ: رابط المشاركة غير صالح أو ناقص.</p>`;
-                return;
-            }
-
+            if (!chatId) { statusMessage.innerHTML = `<p>خطأ: رابط المشاركة غير صالح أو ناقص.</p>`; return; }
             const username = "e-hr1";
             const repo = "Think";
             const branch = "main";
             const filePath = `public/chats/${chatId}.json`;
-            
             const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
-
-            fetch(fileUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        return new Promise(resolve => setTimeout(resolve, 1500)).then(() => {
-                            return fetch(fileUrl + '?t=' + new Date().getTime());
-                        });
-                    }
-                    return response;
-                })
-                .then(response => {
-                    if (!response.ok) {
-                         throw new Error(`فشل في العثور على المحادثة (الكود: ${response.status}).`);
-                    }
-                    return response.json();
-                })
-                .then(conversation => {
-                    displayConversation(conversation);
-                })
-                .catch(error => {
-                    console.error('Error fetching conversation:', error);
-                    statusMessage.innerHTML = `<p>حدث خطأ أثناء تحميل المحادثة.</p><p>${error.message}</p>`;
-                });
+            fetch(fileUrl).then(r => !r.ok ? new Promise(res => setTimeout(res, 1500)).then(() => fetch(fileUrl + '?t=' + new Date().getTime())) : r).then(r => { if (!r.ok) throw new Error(`فشل في العثور على المحادثة (الكود: ${r.status}).`); return r.json(); }).then(c => displayConversation(c)).catch(e => { console.error(e); statusMessage.innerHTML = `<p>حدث خطأ أثناء تحميل المحادثة.</p><p>${e.message}</p>`; });
         });
 
-        // ✅ *** تعديل دالة عرض المحادثة لدعم الصور ***
+        // ✅ *** تعديل دالة عرض المحادثة لدعم الملفات ***
         function displayConversation(conversation) {
             const chatTitle = document.getElementById('chat-title');
             const chatBody = document.getElementById('chat-body');
-
             chatTitle.textContent = conversation.title || 'محادثة';
             chatBody.innerHTML = '';
 
@@ -208,14 +111,31 @@
                 return;
             }
 
+            const username = "e-hr1";
+            const repo = "Think";
+            const branch = "main";
+
+            // دالة مساعدة للحصول على رابط الأيقونة
+            function getIconUrl(fileType) {
+                const iconMap = {
+                    'pdf': 'icon_file_pdf.png',
+                    'word': 'icon_word.png',
+                    'excel': 'icon_exel.png',
+                    'pptx': 'icon_pptx.png',
+                    'txt': 'icon_txt.png',
+                    'code': 'icon_file_code.png'
+                };
+                const iconName = iconMap[fileType] || 'icon_file_code.png'; // أيقونة افتراضية
+                return `https://raw.githubusercontent.com/${username}/${repo}/${branch}/public/assets/icons/${iconName}`;
+            }
+
             conversation.messages.forEach(msg => {
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message', msg.isUser ? 'user' : 'bot');
-
                 const messageWrapper = document.createElement('div');
                 messageWrapper.style.width = '100%';
 
-                // عرض نص الرسالة (إذا كان موجودًا)
+                // عرض نص الرسالة
                 if (msg.text && msg.text.trim() !== '') {
                     const contentDiv = document.createElement('div');
                     contentDiv.classList.add('message-content');
@@ -223,25 +143,51 @@
                     messageWrapper.appendChild(contentDiv);
                 }
 
-                // عرض الصور (إذا كانت موجودة)
+                // عرض الصور
                 if (msg.imageUrls && msg.imageUrls.length > 0) {
                     const imagesContainer = document.createElement('div');
                     imagesContainer.classList.add('message-images');
-                    
-                    // تحديد اتجاه الصور بناءً على المرسل
-                    if (msg.isUser) {
-                        imagesContainer.style.justifyContent = 'flex-end';
-                    }
-
+                    if (msg.isUser) { imagesContainer.style.justifyContent = 'flex-end'; }
                     msg.imageUrls.forEach(url => {
                         const img = document.createElement('img');
                         img.src = url;
                         img.alt = 'صورة مرفقة';
-                        // إضافة خاصية لفتح الصورة في نافذة جديدة عند النقر
                         img.onclick = () => window.open(url, '_blank');
                         imagesContainer.appendChild(img);
                     });
                     messageWrapper.appendChild(imagesContainer);
+                }
+
+                // ✅ --- عرض الملفات المرفقة (جديد) ---
+                if (msg.attachedFiles && msg.attachedFiles.length > 0) {
+                    const filesContainer = document.createElement('div');
+                    filesContainer.classList.add('message-files');
+
+                    msg.attachedFiles.forEach(file => {
+                        const fileDiv = document.createElement('div');
+                        fileDiv.classList.add('file-attachment');
+
+                        const iconImg = document.createElement('img');
+                        iconImg.src = getIconUrl(file.type);
+                        
+                        const infoDiv = document.createElement('div');
+                        infoDiv.classList.add('file-info');
+                        
+                        const nameDiv = document.createElement('div');
+                        nameDiv.classList.add('name');
+                        nameDiv.textContent = file.name;
+                        
+                        const sizeDiv = document.createElement('div');
+                        sizeDiv.classList.add('size');
+                        sizeDiv.textContent = file.size;
+
+                        infoDiv.appendChild(nameDiv);
+                        infoDiv.appendChild(sizeDiv);
+                        fileDiv.appendChild(iconImg);
+                        fileDiv.appendChild(infoDiv);
+                        filesContainer.appendChild(fileDiv);
+                    });
+                    messageWrapper.appendChild(filesContainer);
                 }
 
                 // عرض الوقت
@@ -256,6 +202,5 @@
             });
         }
     </script>
-
 </body>
 </html>
