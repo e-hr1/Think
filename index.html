@@ -5,27 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>عرض المحادثة</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- مكتبة لتمييز الأكواد البرمجية -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
     <style>
         :root {
             --bg-color: #f0f2f5; --text-color: #050505; --container-bg: #ffffff; --container-border: #e0e0e0; --header-bg: #f5f6f7; --header-border: #ddd; --bot-bubble-bg: transparent; --user-bubble-bg: #ECF2FE; --user-bubble-text: #050505; --timestamp-color: #65676b; --attachment-border: #ddd; --welcome-icon-filter: none;
-            /* متغيرات جديدة للتصميم الفخم */
-            --code-bg: #1e1e1e;
-            --code-header-bg: #333;
-            --code-text-color: #d4d4d4;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #eef0f2;
+            --code-text-color: #24292e;
             --table-border-color: #e0e0e0;
             --table-header-bg: #f9f9f9;
             --table-row-hover: #f1f1f1;
         }
         .dark-mode {
-            --bg-color: #18191a; --text-color: #e4e6eb; --container-bg: #242526; --container-border: #3a3b3c; --header-bg: #3a3b3c; --header-border: #444; --bot-bubble-bg: transparent; --user-bubble-bg: #2A3C5C; --user-bubble-text: #e4e6eb; --timestamp-color: #b0b3b8; --attachment-border: #444; --welcome-icon-filter: brightness(0) invert(1);
-            /* متغيرات الوضع المظلم */
-            --code-bg: #252526;
-            --code-header-bg: #3a3b3c;
-            --code-text-color: #e4e6eb;
+            --bg-color: #18191a; --text-color: #e4e6eb; --container-bg: #242526; --container-border: #3a3b3c; --header-bg: #3a3b3c; --header-border: #444; --bot-bubble-bg: transparent; --user-bubble-bg: #2A3C5C; --user-bubble-text: #e4e6eb; --timestamp-color: #b0b3b8; --attachment-border: #444;
+            --code-bg: #1e1e1e;
+            --code-header-bg: #333;
+            --code-text-color: #d4d4d4;
             --table-border-color: #444;
             --table-header-bg: #3a3b3c;
             --table-row-hover: #4a4b4c;
@@ -75,7 +72,7 @@
         .message {
             display: flex;
             margin-bottom: 4px;
-            max-width: 90%;
+            max-width: 95%; /* زيادة العرض قليلًا */
         }
         .message.user {
             margin-left: auto;
@@ -96,7 +93,8 @@
         .message-wrapper {
             display: flex;
             flex-direction: column;
-            max-width: 100%; /* السماح للمحتوى بالتمدد */
+            max-width: 100%;
+            overflow: hidden; /* يمنع المحتوى الداخلي من الخروج */
         }
         .message.user .message-wrapper { align-items: flex-end; }
         .message.bot .message-wrapper { align-items: flex-start; }
@@ -201,30 +199,31 @@
         }
         .dark-mode .file-info .size { color: #a0a0a0; }
 
-        /* --- بداية تنسيقات الجداول والأكواد الفخمة --- */
+        /* --- بداية تنسيقات الجداول والأكواد --- */
 
-        /* تنسيق الجداول */
+        /* حاوية الجداول لجعلها قابلة للتمرير الأفقي */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid var(--table-border-color);
+            border-radius: 8px;
+        }
         .message.bot .bubble table {
             width: 100%;
             border-collapse: collapse;
-            margin: 16px 0;
             font-size: 0.9em;
-            border-radius: 8px;
-            overflow: hidden; /* لإخفاء زوايا aلـ th/td الحادة */
-            border: 1px solid var(--table-border-color);
+            min-width: 500px; /* يضمن أن الجدول لا ينضغط أكثر من اللازم */
         }
         .message.bot .bubble th, .message.bot .bubble td {
             padding: 12px 15px;
             text-align: right;
             border-bottom: 1px solid var(--table-border-color);
+            white-space: nowrap; /* يمنع التفاف النصوص داخل الخلايا */
         }
         .message.bot .bubble th {
             background-color: var(--table-header-bg);
             font-weight: 600;
             color: var(--text-color);
-        }
-        .message.bot .bubble tr {
-            background-color: var(--container-bg);
         }
         .message.bot .bubble tr:last-of-type td {
             border-bottom: none;
@@ -232,19 +231,16 @@
         .message.bot .bubble tr:hover {
             background-color: var(--table-row-hover);
         }
-        .table-wrapper {
-            overflow-x: auto; /* للسماح بالتمرير الأفقي للجداول الكبيرة */
-            margin: 1em 0;
-        }
 
         /* تنسيق بلوكات الأكواد */
         .message.bot .bubble pre {
             background-color: var(--code-bg);
             border-radius: 8px;
             margin: 16px 0;
-            overflow: hidden;
-            direction: ltr; /* الأكواد دائمًا من اليسار لليمين */
+            overflow: hidden; /* لإخفاء زوايا code الداخلية */
+            direction: ltr;
             position: relative;
+            border: 1px solid var(--table-border-color);
         }
         .code-header {
             display: flex;
@@ -252,32 +248,45 @@
             align-items: center;
             background-color: var(--code-header-bg);
             padding: 8px 12px;
-            color: #ccc;
+            color: #586069;
             font-size: 0.8em;
+            border-bottom: 1px solid var(--table-border-color);
+        }
+        .dark-mode .code-header {
+            color: #ccc;
         }
         .copy-button {
-            background-color: #555;
-            color: white;
-            border: none;
+            background-color: #f6f8fa;
+            color: #24292e;
+            border: 1px solid rgba(27, 31, 35, 0.15);
             padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s;
         }
+        .dark-mode .copy-button {
+            background-color: #555;
+            color: white;
+            border-color: #666;
+        }
         .copy-button:hover {
+            background-color: #eef0f2;
+        }
+        .dark-mode .copy-button:hover {
             background-color: #666;
         }
         .copy-button.copied {
-            background-color: #28a745; /* اللون الأخضر للتأكيد */
+            background-color: #28a745;
+            color: white;
         }
         .message.bot .bubble pre code {
             display: block;
             padding: 16px;
             color: var(--code-text-color);
             white-space: pre;
-            overflow-x: auto;
-            background-color: transparent; /* الخلفية الآن على pre */
+            overflow-x: auto; /* هذا هو السطر المسؤول عن التمرير الأفقي للكود */
+            background-color: transparent;
             font-family: 'SF Mono', 'Fira Code', 'Consolas', 'monospace';
             font-size: 0.9em;
             line-height: 1.6;
@@ -302,9 +311,22 @@
             const chatBody = document.getElementById('chat-body');
             const chatTitle = document.getElementById('chat-title');
 
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.classList.add('dark-mode');
+            // التبديل للوضع المظلم بناءً على إعدادات النظام
+            const darkModeMatcher = window.matchMedia('(prefers-color-scheme: dark)');
+            function applyDarkMode(e) {
+                if (e.matches) {
+                    document.body.classList.add('dark-mode');
+                    // تغيير ثيم highlight.js للوضع المظلم
+                    document.querySelector('link[href*="highlight.js"]').href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    // تغيير ثيم highlight.js للوضع العادي
+                    document.querySelector('link[href*="highlight.js"]').href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+                }
             }
+            darkModeMatcher.addListener(applyDarkMode);
+            applyDarkMode(darkModeMatcher);
+
 
             const params = new URLSearchParams(window.location.search);
             const chatId = params.get('id');
@@ -435,23 +457,21 @@
                 chatBody.appendChild(messageEl);
             });
 
-            // استدعاء الدالة الجديدة بعد عرض المحتوى
+            // استدعاء الدوال لتحسين عرض الأكواد والجداول
             enhanceCodeBlocks();
             wrapTables();
         }
 
-        // --- بداية الدوال الجديدة لتصميم الأكواد والجداول ---
-
         function enhanceCodeBlocks() {
             document.querySelectorAll('.message.bot .bubble pre').forEach(preElement => {
+                if (preElement.querySelector('.code-header')) return; // تجنب إضافة الهيدر مرتين
+
                 const codeElement = preElement.querySelector('code');
                 if (!codeElement) return;
 
-                // الحصول على اللغة من الكلاس (e.g., language-javascript)
                 const langClass = Array.from(codeElement.classList).find(c => c.startsWith('language-'));
                 const lang = langClass ? langClass.replace('language-', '') : 'code';
 
-                // إنشاء الشريط العلوي
                 const header = document.createElement('div');
                 header.className = 'code-header';
 
@@ -465,10 +485,8 @@
                 header.appendChild(langName);
                 header.appendChild(copyButton);
 
-                // إضافة الشريط العلوي قبل عنصر الكود داخل <pre>
                 preElement.insertBefore(header, preElement.firstChild);
 
-                // إضافة وظيفة النسخ
                 copyButton.addEventListener('click', () => {
                     navigator.clipboard.writeText(codeElement.innerText).then(() => {
                         copyButton.textContent = 'تم النسخ!';
@@ -491,8 +509,6 @@
                 wrapper.appendChild(table);
             });
         }
-        // --- نهاية الدوال الجديدة ---
-
     </script>
 </body>
 </html>
