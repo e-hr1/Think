@@ -12,7 +12,8 @@
             padding: 0;
             height: 100%;
             font-family: 'Cairo', sans-serif;
-            background: linear-gradient(to bottom, #ffffff, #e6e6fa); /* تدرج من الأبيض إلى درجة أرجوانية فاتحة */
+            background: linear-gradient(to bottom, #ffffff, #f2e6ff); /* تدرج أفتح قليلاً */
+            color: #333;
         }
 
         .advertisement {
@@ -29,20 +30,19 @@
         .header {
             width: 100%;
             display: flex;
-            justify-content: flex-end; /* محاذاة لليسار في RTL */
+            justify-content: flex-end;
             align-items: center;
         }
 
         .header .logo {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
         .header .logo-text {
             font-size: 28px;
             font-weight: bold;
-            color: #000;
-            margin-right: 10px;
         }
 
         .header .logo-icon {
@@ -57,26 +57,26 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px; /* زيادة طفيفة للعرض */
         }
 
         .main-content h1 {
-            font-size: 36px;
+            font-size: clamp(28px, 5vw, 36px); /* حجم خط متجاوب */
             color: #333;
             margin-bottom: 10px;
         }
 
         .main-content h2 {
-            font-size: 24px;
+            font-size: clamp(18px, 4vw, 24px); /* حجم خط متجاوب */
             color: #555;
             font-weight: normal;
             margin-bottom: 20px;
         }
 
         .main-content p {
-            font-size: 18px;
+            font-size: clamp(16px, 3vw, 18px); /* حجم خط متجاوب */
             color: #666;
-            line-height: 1.6;
+            line-height: 1.7; /* زيادة التباعد بين السطور */
             margin-bottom: 30px;
         }
 
@@ -84,21 +84,104 @@
             display: inline-block;
             background-color: #8a2be2; /* لون أرجواني */
             color: #fff;
-            padding: 15px 30px;
+            padding: 15px 35px;
             font-size: 20px;
             font-weight: bold;
             border-radius: 50px;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
             border: none;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
         }
 
         .download-button:hover {
             background-color: #7b1fa2; /* لون أرجواني أغمق عند التحويم */
+            transform: translateY(-2px); /* تأثير رفع بسيط */
         }
 
         .app-mockup {
+            width: 100%;
+            max-width: 450px;
+            margin-top: 40px;
+        }
+        
+        /* --- كود رسالة الخطأ (Toast) --- */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            max-width: 90%;
+            background-color: #d32f2f; /* لون أحمر للخطأ */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 10;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 30px;
+            font-size: 17px;
+            opacity: 0;
+            transition: all 0.5s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast"></div>
+
+    <div class="advertisement">
+        
+        <div class="header">
+            <div class="logo">
+                <span class="logo-text">Think</span>
+                <!-- تأكد من صحة هذا المسار -->
+                <img src="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icon_thinkapp.png" alt="أيقونة التطبيق" class="logo-icon">
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h1>مساعد ذكاء اصطناعي، شامل</h1>
+            <h2>شخصي، سريع، ومجاني</h2>
+            <p>
+                اكتشف تطبيق Think AI، رفيقك الذكي الذي يساعدك في تنظيم مهامك، والإجابة على استفساراتك، وتعزيز إنتاجيتك بفضل ميزاته المتقدمة وسهولة استخدامه.
+            </p>
+            <!-- استبدل # برابط التحميل الفعلي -->
+            <a href="#" class="download-button">احصل على تطبيق أندرويد</a>
+        </div>
+
+        <!-- تأكد من صحة هذا المسار -->
+        <img src="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/app-mockup.png" alt="نماذج لواجهة التطبيق" class="app-mockup">
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const toastMessage = params.get('toast');
+
+            if (toastMessage) {
+                const toastElement = document.getElementById('toast');
+                toastElement.textContent = decodeURIComponent(toastMessage);
+                toastElement.className = "toast show";
+                // إخفاء الرسالة بعد 4 ثوانٍ
+                setTimeout(function(){ 
+                    toastElement.className = toastElement.className.replace("show", ""); 
+                }, 4000);
+            }
+        });
+    </script>
+
+</body>
+</html>
             width: 100%;
             max-width: 450px;
             margin-top: 40px;
