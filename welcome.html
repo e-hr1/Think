@@ -1,19 +1,29 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!-- The 'lang' and 'dir' attributes will be set dynamically by JavaScript -->
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إعلان Think AI</title>
+    <!-- The title will be set dynamically -->
+    <title>Think AI Advertisement</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Roboto:wght@400;700&display=swap');
 
         body, html {
             margin: 0;
             padding: 0;
-            height: 100%;
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(to bottom, #ffffff, #f2e6ff); /* تدرج أفتح قليلاً */
+            width: 100%;
+            /* --- التعديل الرئيسي هنا --- */
+            min-height: 100vh; 
+            /* ------------------------- */
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #ffffff, #f2e6ff);
             color: #333;
+        }
+
+        /* Style for Arabic language */
+        body[lang="ar"] {
+            font-family: 'Cairo', sans-serif;
         }
 
         .advertisement {
@@ -21,7 +31,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            min-height: 100vh;
+            min-height: 100vh; /* هذا يضمن أن المحتوى نفسه يملأ الشاشة عمودياً */
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
@@ -32,6 +42,10 @@
             display: flex;
             justify-content: flex-end;
             align-items: center;
+        }
+        
+        html[dir="ltr"] .header {
+            justify-content: flex-start;
         }
 
         .header .logo {
@@ -57,32 +71,32 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 550px; /* زيادة طفيفة للعرض */
+            max-width: 550px;
         }
 
         .main-content h1 {
-            font-size: clamp(28px, 5vw, 36px); /* حجم خط متجاوب */
+            font-size: clamp(28px, 5vw, 36px);
             color: #333;
             margin-bottom: 10px;
         }
 
         .main-content h2 {
-            font-size: clamp(18px, 4vw, 24px); /* حجم خط متجاوب */
+            font-size: clamp(18px, 4vw, 24px);
             color: #555;
             font-weight: normal;
             margin-bottom: 20px;
         }
 
         .main-content p {
-            font-size: clamp(16px, 3vw, 18px); /* حجم خط متجاوب */
+            font-size: clamp(16px, 3vw, 18px);
             color: #666;
-            line-height: 1.7; /* زيادة التباعد بين السطور */
+            line-height: 1.7;
             margin-bottom: 30px;
         }
 
         .download-button {
             display: inline-block;
-            background-color: #8a2be2; /* لون أرجواني */
+            background-color: #8a2be2;
             color: #fff;
             padding: 15px 35px;
             font-size: 20px;
@@ -96,8 +110,8 @@
         }
 
         .download-button:hover {
-            background-color: #7b1fa2; /* لون أرجواني أغمق عند التحويم */
-            transform: translateY(-2px); /* تأثير رفع بسيط */
+            background-color: #7b1fa2;
+            transform: translateY(-2px);
         }
 
         .app-mockup {
@@ -106,12 +120,11 @@
             margin-top: 40px;
         }
         
-        /* --- كود رسالة الخطأ (Toast) --- */
         .toast {
             visibility: hidden;
             min-width: 250px;
             max-width: 90%;
-            background-color: #d32f2f; /* لون أحمر للخطأ */
+            background-color: #d32f2f;
             color: #fff;
             text-align: center;
             border-radius: 8px;
@@ -143,36 +156,82 @@
         <div class="header">
             <div class="logo">
                 <span class="logo-text">Think</span>
-                <!-- تأكد من صحة هذا المسار -->
-                <img src="public/assets/icons/icon_thinkapp.png" alt="أيقونة التطبيق" class="logo-icon">
+                <img src="public/assets/icons/icon_thinkapp.png" alt="App Icon" class="logo-icon" data-i18n-alt="appIconAlt">
             </div>
         </div>
 
         <div class="main-content">
-            <h1>مساعد ذكاء اصطناعي، شامل</h1>
-            <h2>شخصي، سريع، ومجاني</h2>
-            <p>
-                اكتشف تطبيق Think AI، رفيقك الذكي الذي يساعدك في تنظيم مهامك، والإجابة على استفساراتك، وتعزيز إنتاجيتك بفضل ميزاته المتقدمة وسهولة استخدامه.
-            </p>
-            <!-- استبدل # برابط التحميل الفعلي -->
-            <a href="#" class="download-button">احصل على تطبيق أندرويد</a>
+            <h1 data-i18n="mainHeading"></h1>
+            <h2 data-i18n="subHeading"></h2>
+            <p data-i18n="description"></p>
+            <a href="#" class="download-button" data-i18n="downloadButton"></a>
         </div>
 
-        <!-- تأكد من صحة هذا المسار -->
-        <img src="public/assets/icons/app-mockup.png" alt="نماذج لواجهة التطبيق" class="app-mockup">
+        <img src="public/assets/icons/app-mockup.png" alt="App Mockup" class="app-mockup" data-i18n-alt="mockupAlt">
 
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- 1. Language Dictionary ---
+            const translations = {
+                en: {
+                    pageTitle: "Think AI Advertisement",
+                    appIconAlt: "App Icon",
+                    mainHeading: "An All-in-One AI Assistant",
+                    subHeading: "Personal, Fast, and Free",
+                    description: "Discover Think AI, your smart companion that helps you organize tasks, answer queries, and boost your productivity with its advanced features and ease of use.",
+                    downloadButton: "Get the Android App",
+                    mockupAlt: "App interface mockups",
+                    toastDefaultError: "An unknown error occurred."
+                },
+                ar: {
+                    pageTitle: "إعلان Think AI",
+                    appIconAlt: "أيقونة التطبيق",
+                    mainHeading: "مساعد Ai، شامل",
+                    subHeading: "شخصي، سريع، ومجاني",
+                    description: "اكتشف تطبيق Think AI، رفيقك الذكي الذي يساعدك في تنظيم مهامك، والإجابة على استفساراتك، وتعزيز إنتاجيتك بفضل ميزاته المتقدمة وسهولة استخدامه.",
+                    downloadButton: "احصل على تطبيق أندرويد",
+                    mockupAlt: "نماذج لواجهة التطبيق",
+                    toastDefaultError: "حدث خطأ غير معروف."
+                }
+            };
+
+            // --- 2. Detect Language ---
+            const userLang = navigator.language.split('-')[0];
+            const lang = userLang === 'ar' ? 'ar' : 'en';
+
+            // --- 3. Apply Translations and Attributes ---
+            const htmlEl = document.documentElement;
+            htmlEl.lang = lang;
+            htmlEl.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.title = translations[lang].pageTitle;
+
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-alt]').forEach(element => {
+                const key = element.getAttribute('data-i18n-alt');
+                if (translations[lang][key]) {
+                    element.alt = translations[lang][key];
+                }
+            });
+
+            // --- 4. Handle Toast Message ---
             const params = new URLSearchParams(window.location.search);
             const toastMessage = params.get('toast');
 
             if (toastMessage) {
                 const toastElement = document.getElementById('toast');
-                toastElement.textContent = decodeURIComponent(toastMessage);
+                const decodedMessage = decodeURIComponent(toastMessage);
+                toastElement.textContent = translations[lang][decodedMessage] || decodedMessage;
+                
                 toastElement.className = "toast show";
-                // إخفاء الرسالة بعد 4 ثوانٍ
                 setTimeout(function(){ 
                     toastElement.className = toastElement.className.replace("show", ""); 
                 }, 4000);
