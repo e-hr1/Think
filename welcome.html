@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعلان Think AI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(to bottom, #ffffff, #e6e6fa); /* تدرج من الأبيض إلى درجة أرجوانية فاتحة */
+        }
+
+        .advertisement {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* محاذاة لليسار في RTL */
+            align-items: center;
+        }
+
+        .header .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .logo-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #000;
+            margin-right: 10px;
+        }
+
+        .header .logo-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .main-content h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .main-content h2 {
+            font-size: 24px;
+            color: #555;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        .main-content p {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .download-button {
+            display: inline-block;
+            background-color: #8a2be2; /* لون أرجواني */
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background-color: #7b1fa2; /* لون أرجواني أغمق عند التحويم */
+        }
+
+        .app-mockup {
+            width: 100%;
+            max-width: 450px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="advertisement">
+        
+        <div class="header">
+            <div class="logo">
+                <span class="logo-text">Think</span>
+                <img src="public/assets/icons/icon_thinkapp.png" alt="أيقونة دماغ" class="logo-icon">
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h1>مساعد ذكاء اصطناعي، شامل</h1>
+            <h2>شخصي، سريع، ومجاني</h2>
+            <p>
+                اكتشف تطبيق Think AI، رفيقك الذكي الذي يساعدك في تنظيم مهامك، والإجابة على استفساراتك، وتعزيز إنتاجيتك بفضل ميزاته المتقدمة وسهولة استخدامه.
+            </p>
+            <a href="#" class="download-button">احصل على تطبيق أندرويد</a>
+        </div>
+
+        <img src="public/assets/icons/app-mockup.png" alt="نماذج لواجهة التطبيق" class="app-mockup">
+
+    </div>
+
+</body>
+</html>
