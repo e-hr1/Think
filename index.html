@@ -3,185 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Think AI</title>
+    <title>عرض المحادثة</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        @font-face {
-            font-family: 'SF Pro Display';
-            src: url('https://raw.githubusercontent.com/e-hr1/Think/main/public/fonts/SF-Pro-Display-Bold.otf') format('opentype');
-            font-weight: 700;
-            font-style: normal;
+        /* --- متغيرات الألوان --- */
+        :root {
+            --light-bg: #FFFFFF;
+            --light-text: #000000;
+            --light-header-bg: #FFFFFF;
+            --light-header-border: #E0E0E0;
+            --light-bot-bubble: #F8F8F8;
+            --light-user-bubble: #ECF2FE;
+            --light-user-text: #050505;
+            --light-timestamp: #65676b;
         }
 
-        @font-face {
-            font-family: 'SF Pro Text';
-            src: url('https://raw.githubusercontent.com/e-hr1/Think/main/public/fonts/SF-Pro-Text-Regular.otf') format('opentype');
-            font-weight: 400;
-            font-style: normal;
+        .dark-mode {
+            --dark-bg: #121212;
+            --dark-text: #FFFFFF;
+            --dark-header-bg: #121212;
+            --dark-header-border: #3a3b3c;
+            --dark-bot-bubble: #1E1E1E;
+            --dark-user-bubble: #2A3C5C;
+            --dark-user-text: #e4e6eb;
+            --dark-timestamp: #b0b3b8;
         }
 
-        @font-face {
-            font-family: 'SF Pro Text';
-            src: url('https://raw.githubusercontent.com/e-hr1/Think/main/public/fonts/SF-Pro-Text-Medium.otf') format('opentype');
-            font-weight: 500;
-            font-style: normal;
-        }
-
-        body {
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(180deg, #F9F3FF 0%, #E3E9FF 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--light-bg); /* لون فاتح افتراضي */
         }
 
-        .welcome-screen {
+        .dark-mode {
+            background-color: var(--dark-bg);
+        }
+
+        /* --- تصميم حاوية الدردشة --- */
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            margin: auto;
+            background-color: var(--light-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--light-header-border);
+            background-color: var(--light-header-bg);
             text-align: center;
-            padding: 24px;
-            box-sizing: border-box;
-            max-width: 400px;
+            flex-shrink: 0;
+        }
+        .chat-header h1 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: bold;
+            font-family: 'Arial';
+            color: var(--light-text);
+        }
+        .dark-mode .chat-header h1 {
+            color: #C0C1C9;
         }
 
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 80px;
-        }
-
-        .header .logo {
-            width: 32px;
-            height: 32px;
-        }
-
-        .header .title {
-            font-family: 'SF Pro Display', sans-serif;
-            font-weight: 700;
-            font-size: 28px;
-            color: #000;
-        }
-
-        .header .logo-container {
-            width: 38px;
-            height: 38px;
-            background-color: #000;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 4px;
-        }
-
-        .main-text {
-            color: #000;
-            font-family: 'SF Pro Display', sans-serif;
-            font-weight: 700;
-            font-size: 30px;
-            line-height: 1.3;
-        }
-
-        .sub-text {
-            color: #000;
-            font-weight: 500;
-            font-size: 17px;
-            line-height: 1.6;
-            margin-top: 16px;
+        .chat-body {
+            flex-grow: 1;
+            padding: 10px 8px;
+            overflow-y: auto;
         }
         
-        .android-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: linear-gradient(180deg, #6C3DFF 0%, #9964FF 100%);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            padding: 16px 32px;
-            font-size: 17px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            margin-top: 48px;
-            box-shadow: 0 4px 10px rgba(108, 61, 255, 0.2);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .dark-mode .chat-body, .dark-mode .chat-container {
+            background-color: var(--dark-bg);
         }
-        
-        .android-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(108, 61, 255, 0.3);
+        .dark-mode .chat-header {
+             background-color: var(--dark-header-bg);
+             border-bottom-color: var(--dark-header-border);
         }
 
-        .android-icon {
-            width: 24px;
-            height: 24px;
-        }
-
-        .phone-mockups {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: -1;
-        }
-
-        .mockup {
-            width: 170px;
-            height: auto;
-        }
-
-        .mockup.left {
-            transform: translateX(-20%) rotate(-10deg);
-            z-index: 2;
-        }
-
-        .mockup.right {
-            transform: translateX(20%) rotate(10deg);
-            z-index: 2;
-        }
+        /* ... باقي تنسيقات CSS للمحادثة كما هي ... */
+        .message { display: flex; margin-bottom: 4px; max-width: 90%; }
+        .message.user { margin-left: auto; flex-direction: row-reverse; }
+        .message.bot { margin-right: auto; }
+        .message-wrapper { display: flex; flex-direction: column; }
+        .message.user .message-wrapper { align-items: flex-end; }
+        .message.bot .message-wrapper { align-items: flex-start; }
+        .sender-name { font-size: 0.8em; font-weight: bold; color: var(--light-timestamp); padding: 0 12px; margin-bottom: 4px; }
+        .dark-mode .sender-name { color: var(--dark-timestamp); }
+        .bubble { padding: 12px; border-radius: 18px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+        .message.user .bubble { background-color: var(--light-user-bubble); color: var(--light-user-text); }
+        .message.bot .bubble { background-color: var(--light-bot-bubble); color: var(--light-text); }
+        .dark-mode .message.user .bubble { background-color: var(--dark-user-bubble); color: var(--dark-user-text); }
+        .dark-mode .message.bot .bubble { background-color: var(--dark-bot-bubble); color: var(--dark-text); }
+        .bubble p { margin: 0 0 8px 0; }
+        .bubble p:last-child { margin-bottom: 0; }
+        .bubble ul, .bubble ol { margin: 8px 0; padding-inline-start: 20px; }
+        .bubble li { margin-bottom: 4px; }
+        .bubble a { color: #007bff; text-decoration: underline; }
+        .bubble strong { font-weight: bold; }
+        .bubble em { font-style: italic; }
+        .bubble code { font-family: 'monospace'; background-color: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; }
+        .dark-mode .bubble code { background-color: rgba(255,255,255,0.1); }
+        .timestamp { font-size: 0.75em; color: var(--light-timestamp); padding: 4px 12px; }
+        .dark-mode .timestamp { color: var(--dark-timestamp); }
     </style>
 </head>
 <body>
 
-    <div class="welcome-screen">
-        <div class="header">
-            <div class="logo-container">
-                <img src="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icons/icon_thinkapp.png" alt="Think AI Logo" class="logo">
-            </div>
-            <h1 class="title">Think</h1>
-        </div>
-
-        <div class="main-text">
-            مساعد AI شامل.<br>شخصي، سريع ومجاني.
-        </div>
-        
-        <p class="sub-text">
-            تعرف على تطبيق Think AI الجديد،<br>
-            مساعد الذكاء الاصطناعي الشخصي<br>
-            الذي يفهم احتياجاتك. احصل على<br>
-            إجابات مخصصة ونصائح وإلهام<br>
-            خلال يومك.
-        </p>
-
-        <a href="#" class="android-button">
-            <img src="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icons/android.png" alt="Android Icon" class="android-icon">
-            <span>احصل على تطبيق Android</span>
-        </a>
-
-        <div class="phone-mockups">
-            <img src="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/phone-mockup-1.png" alt="Phone Mockup 1" class="mockup left">
-            <img src="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/phone-mockup-2.png" alt="Phone Mockup 2" class="mockup right">
-        </div>
+    <!-- حاوية الدردشة -->
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header"><h1 id="chat-title"></h1></div>
+        <div id="chat-body" class="chat-body"></div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const chatId = params.get('id');
+
+            // 1. إذا لم يكن هناك ID، قم بالتوجيه إلى صفحة الترحيب
+            if (!chatId) {
+                window.location.href = 'welcome.html';
+                return;
+            }
+
+            // إذا كان هناك ID، ابدأ في محاولة جلب المحادثة
+            fetchChat(chatId);
+        });
+
+        function fetchChat(chatId) {
+            const username = "e-hr1";
+            const repo = "Think";
+            const branch = "main";
+            const filePath = `public/chats/${chatId}.json`;
+            const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
+
+            fetch(fileUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        // إذا كان الرد غير ناجح (مثل 404 Not Found)
+                        if (response.status === 404) {
+                            throw new Error('لم يتم العثور على المحادثة. تأكد من صحة الرابط.');
+                        } else {
+                            throw new Error(`حدث خطأ أثناء التحميل. رمز الحالة: ${response.status}`);
+                        }
+                    }
+                    return response.json();
+                })
+                .then(conversation => {
+                    if (!conversation || !conversation.messages || conversation.messages.length === 0) {
+                        throw new Error('ملف المحادثة فارغ أو تالف.');
+                    }
+                    displayConversation(conversation);
+                })
+                .catch(error => {
+                    console.error(error);
+                    // 2. عند حدوث أي خطأ، قم بالتوجيه إلى صفحة الترحيب مع رسالة الخطأ
+                    // نستخدم encodeURIComponent لضمان تمرير النص بشكل صحيح في الرابط
+                    const errorMessage = encodeURIComponent(error.message);
+                    window.location.href = `welcome.html?error=${errorMessage}`;
+                });
+        }
+
+        function displayConversation(conversation) {
+            // تحديد الوضع (فاتح/داكن)
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.className = 'dark-mode';
+            } else {
+                document.body.className = '';
+            }
+
+            const chatTitle = document.getElementById('chat-title');
+            const chatBody = document.getElementById('chat-body');
+            chatTitle.textContent = conversation.title || 'محادثة';
+            chatBody.innerHTML = '';
+
+            conversation.messages.forEach(msg => {
+                if (!msg.text && (!msg.imageUrls || msg.imageUrls.length === 0) && (!msg.attachedFiles || msg.attachedFiles.length === 0)) return;
+
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${msg.isUser ? 'user' : 'bot'}`;
+                const wrapperEl = document.createElement('div');
+                wrapperEl.className = 'message-wrapper';
+
+                if (!msg.isUser) {
+                    const senderNameEl = document.createElement('div');
+                    senderNameEl.className = 'sender-name';
+                    senderNameEl.textContent = 'ThinkAi';
+                    wrapperEl.appendChild(senderNameEl);
+                }
+
+                if (msg.text && msg.text.trim() !== '') {
+                    const bubbleEl = document.createElement('div');
+                    bubbleEl.className = 'bubble';
+                    bubbleEl.innerHTML = msg.isUser ? msg.text : marked.parse(msg.text);
+                    wrapperEl.appendChild(bubbleEl);
+                }
+
+                const timestampEl = document.createElement('div');
+                timestampEl.className = 'timestamp';
+                timestampEl.textContent = new Date(msg.timestamp).toLocaleString('ar-SA', { hour: 'numeric', minute: 'numeric', hour12: true });
+                wrapperEl.appendChild(timestampEl);
+
+                messageEl.appendChild(wrapperEl);
+                chatBody.appendChild(messageEl);
+            });
+        }
+    </script>
 </body>
 </html>
- 
