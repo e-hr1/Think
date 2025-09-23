@@ -255,6 +255,10 @@
 
             // --- التعديل 1: إعادة التوجيه إذا لم يوجد ID ---
             if (!chatId) {
+                // ملاحظة: هذا السطر سيعيد التوجيه فوراً إذا لم يكن هناك 'id' في الرابط
+                // للاختبار، يمكنك إضافة ?id=اسم_ملف_المحادثة إلى نهاية رابط الملف
+                // مثال: file:///path/to/your/chat.html?id=example
+                // أو يمكنك تعطيل هذا الجزء أثناء التطوير
                 window.location.href = 'welcome.html';
                 return;
             }
@@ -265,13 +269,23 @@
             const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
 
             fetch(fileUrl)
-                .then(r => !r.ok ? new Promise(res => setTimeout(res, 1500)).then(() => fetch(fileUrl + '?t=' + new Date().getTime())) : r)
-                .then(r => { if (!r.ok) throw new Error(`فشل في العثور على المحادثة (الكود: ${r.status}).`); return r.json(); })
+                .then(r => {
+                    if (!r.ok) {
+                        // محاولة ثانية بعد فترة قصيرة للتغلب على مشاكل التخزين المؤقت في GitHub
+                        return new Promise(res => setTimeout(res, 1500)).then(() => fetch(fileUrl + '?t=' + new Date().getTime()));
+                    }
+                    return r;
+                })
+                .then(r => { 
+                    if (!r.ok) throw new Error(`فشل في العثور على المحادثة (الكود: ${r.status}).`); 
+                    return r.json(); 
+                })
                 .then(conversation => displayConversation(conversation))
                 .catch(error => {
                     console.error(error);
                     // --- التعديل 2: إعادة التوجيه عند الخطأ مع رسالة ---
                     const errorMessage = `حدث خطأ: ${error.message}`;
+                    // ملاحظة: هذا السطر سيعيد التوجيه في حالة حدوث خطأ
                     window.location.href = `welcome.html?toast=${encodeURIComponent(errorMessage)}`;
                 });
         });
@@ -282,7 +296,6 @@
             chatTitle.textContent = conversation.title || 'محادثة';
             chatBody.innerHTML = '';
 
-            // --- التعديل 2: إعادة التوجيه إذا كانت الرسائل فارغة ---
             if (!conversation.messages || conversation.messages.length === 0) {
                 const errorMessage = "المحادثة فارغة أو تم حذفها.";
                 window.location.href = `welcome.html?toast=${encodeURIComponent(errorMessage)}`;
