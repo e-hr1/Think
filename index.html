@@ -1,225 +1,4 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحة المحادثة</title>
-    <!-- مكتبة Marked لتحويل Markdown إلى HTML -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        /* --- إعدادات أساسية وشاملة --- */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            direction: rtl; /* لضمان اتجاه النص من اليمين لليسار */
-        }
-
-        /* --- حاوية المحادثة الرئيسية --- */
-        .chat-container {
-            width: 100%;
-            max-width: 800px;
-            height: 90vh;
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* --- رأس المحادثة --- */
-        .chat-header {
-            padding: 15px 20px;
-            background-color: #f7f7f7;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        #chat-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        /* --- جسم المحادثة (حيث تظهر الرسائل) --- */
-        #chat-body {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background-color: #fff;
-        }
-
-        /* --- أنماط المحادثة --- */
-
-        /* النمط العام للرسائل */
-        .message {
-            display: flex;
-            margin-bottom: 15px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 75%;
-        }
-
-        /* الفقاعة النصية للرسالة */
-        .bubble {
-            padding: 12px 18px;
-            border-radius: 20px;
-            line-height: 1.6;
-            word-wrap: break-word;
-        }
-
-        /* --- رسائل المستخدم (الطرف الأيمن) --- */
-        .message.user {
-            justify-content: flex-end; /* محاذاة الرسالة لليمين */
-        }
-
-        .message.user .message-wrapper {
-            align-items: flex-end;
-        }
-
-        .message.user .bubble {
-            background-color: #007bff; /* لون خلفية رسالة المستخدم (أزرق) */
-            color: white; /* لون نص رسالة المستخدم (أبيض) */
-            border-bottom-right-radius: 5px; /* لتغيير شكل الزاوية */
-        }
-
-        /* --- رسائل البوت (الطرف الأيسر) --- */
-        .message.bot {
-            justify-content: flex-start; /* محاذاة الرسالة لليسار */
-        }
-
-        .message.bot .message-wrapper {
-            align-items: flex-start;
-        }
-
-        /* هذا هو الجزء الأهم لحل مشكلتك */
-        .message.bot .bubble {
-            background-color: #f1f0f0; /* لون خلفية رسالة البوت (رمادي فاتح) */
-            color: #2c2c2c; /* لون نص رسالة البوت (أسود) */
-            border-bottom-left-radius: 5px; /* لتغيير شكل الزاوية */
-        }
-
-        /* تنسيق الوقت */
-        .timestamp {
-            font-size: 0.75rem;
-            color: #999;
-            margin-top: 5px;
-            padding: 0 8px;
-        }
-
-        /* تنسيق المرفقات (صور وملفات) */
-        .attachments-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 5px;
-        }
-
-        .message-images {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        .message-images img {
-            max-width: 150px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .message-images img:hover {
-            transform: scale(1.05);
-        }
-
-        .file-attachment {
-            display: flex;
-            align-items: center;
-            background-color: #f7f7f7;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 8px;
-            max-width: 250px;
-        }
-
-        .file-attachment img {
-            width: 32px;
-            height: 32px;
-            margin-right: 10px; /* في العربية، اليمين هو البداية */
-        }
-
-        .file-info .name {
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .file-info .size {
-            font-size: 0.8rem;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="chat-container">
-        <header class="chat-header">
-            <h1 id="chat-title">محادثة</h1>
-        </header>
-        <div id="chat-body">
-            <!-- سيتم إدراج الرسائل هنا بواسطة JavaScript -->
-        </div>
-    </div>
-
-    <script>
-        // بيانات محادثة وهمية للتجربة
-        const sampleConversation = {
-            title: "محادثة تجريبية",
-            messages: [
-                {
-                    isUser: true,
-                    text: "مرحباً، كيف يمكنني تنسيق الكود في رسائلي؟",
-                    timestamp: new Date().toISOString(),
-                    imageUrls: [],
-                    attachedFiles: []
-                },
-                {
-                    isUser: false,
-                    text: "أهلاً بك! يمكنك استخدام Markdown. لكتابة كود، ضعه بين ثلاث علامات اقتباس مائلة ```.\n\nمثال:\n```javascript\nconsole.log('Hello, World!');\n```",
-                    timestamp: new Date().toISOString(),
-                    imageUrls: [],
-                    attachedFiles: []
-                },
-                {
-                    isUser: true,
-                    text: "ممتاز! شكراً لك. سأقوم بإرفاق صورة الآن.",
-                    timestamp: new Date().toISOString(),
-                    imageUrls: ['https://via.placeholder.com/150/007BFF/FFFFFF?text=صورة+1'],
-                    attachedFiles: []
-                },
-                {
-                    isUser: false,
-                    text: "تم استلام الصورة. هل لديك أي ملفات أخرى؟",
-                    timestamp: new Date().toISOString(),
-                    imageUrls: [],
-                    attachedFiles: [
-                        { name: 'تقرير_الأداء.pdf', size: '1.2 MB', type: 'pdf' },
-                        { name: 'بيانات_المبيعات.xlsx', size: '350 KB', type: 'excel' }
-                    ]
-                }
-            ]
-        };
 
         function displayConversation(conversation) {
             const chatTitle = document.getElementById('chat-title');
@@ -228,7 +7,8 @@
             chatBody.innerHTML = '';
 
             if (!conversation.messages || conversation.messages.length === 0) {
-                chatBody.innerHTML = '<p style="text-align:center; color:#888;">لا توجد رسائل لعرضها.</p>';
+                const errorMessage = "المحادثة فارغة أو تم حذفها.";
+                window.location.href = `welcome.html?toast=${encodeURIComponent(errorMessage)}`;
                 return;
             }
 
@@ -242,11 +22,11 @@
                     'pptx': 'icon_pptx.png', 'txt': 'icon_txt.png', 'code': 'icon_file_code.png'
                 };
                 const iconName = iconMap[fileType] || 'icon_file_code.png';
-                // ملاحظة: تأكد من أن هذا الرابط صحيح ويعمل
                 return `https://raw.githubusercontent.com/${username}/${repo}/${branch}/public/assets/icons/${iconName}`;
             }
 
             conversation.messages.forEach(msg => {
+                // تجاهل الرسائل الفارغة تمامًا
                 if (!msg.text && (!msg.imageUrls || msg.imageUrls.length === 0) && (!msg.attachedFiles || msg.attachedFiles.length === 0)) {
                     return;
                 }
@@ -260,6 +40,7 @@
                 const attachmentsEl = document.createElement('div');
                 attachmentsEl.className = 'attachments-container';
 
+                // عرض الصور
                 if (msg.imageUrls && msg.imageUrls.length > 0) {
                     const imagesContainer = document.createElement('div');
                     imagesContainer.className = 'message-images';
@@ -274,6 +55,7 @@
                     attachmentsEl.appendChild(imagesContainer);
                 }
 
+                // عرض الملفات
                 if (msg.attachedFiles && msg.attachedFiles.length > 0) {
                     msg.attachedFiles.forEach(file => {
                         const fileDiv = document.createElement('div');
@@ -288,13 +70,16 @@
                     });
                 }
                 
+                // إضافة المرفقات قبل النص للمستخدم، وبعده للبوت (للمحاكاة)
                 if (msg.isUser) {
                     wrapperEl.appendChild(attachmentsEl);
                 }
 
+                // عرض النص
                 if (msg.text && msg.text.trim() !== '') {
                     const bubbleEl = document.createElement('div');
                     bubbleEl.className = 'bubble';
+                    // استخدام مكتبة marked لتحويل النص
                     bubbleEl.innerHTML = marked.parse(msg.text);
                     wrapperEl.appendChild(bubbleEl);
                 }
@@ -303,6 +88,7 @@
                      wrapperEl.appendChild(attachmentsEl);
                 }
 
+                // عرض الوقت
                 const timestampEl = document.createElement('div');
                 timestampEl.className = 'timestamp';
                 timestampEl.textContent = new Date(msg.timestamp).toLocaleString('ar-SA', { hour: 'numeric', minute: 'numeric', hour12: true });
@@ -311,15 +97,7 @@
                 messageEl.appendChild(wrapperEl);
                 chatBody.appendChild(messageEl);
             });
-            
-            // التمرير لأسفل تلقائيًا
-            chatBody.scrollTop = chatBody.scrollHeight;
         }
-
-        // استدعاء الدالة عند تحميل الصفحة مع البيانات التجريبية
-        document.addEventListener('DOMContentLoaded', () => {
-            displayConversation(sampleConversation);
-        });
     </script>
 </body>
 </html>
