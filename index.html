@@ -336,7 +336,16 @@
                 if (msg.text && msg.text.trim() !== '') {
                     const bubbleEl = document.createElement('div');
                     bubbleEl.className = 'bubble';
-                    bubbleEl.innerHTML = marked.parse(msg.text);
+                    
+                    // --- التعديل الرئيسي هنا ---
+                    // طبق Markdown فقط إذا كانت الرسالة من البوت
+                    if (!msg.isUser) {
+                        bubbleEl.innerHTML = marked.parse(msg.text);
+                    } else {
+                        // لرسائل المستخدم، استخدم النص كما هو للحماية من إدخال HTML
+                        bubbleEl.textContent = msg.text;
+                    }
+                    
                     wrapperEl.appendChild(bubbleEl);
                 }
                 
