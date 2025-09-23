@@ -1,4 +1,280 @@
 <!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض المحادثة</title>
+    <!-- جلب مكتبة Marked لتحويل Markdown إلى HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            /* --- الوضع الفاتح (Light Mode) --- */
+            --bg-color: #f0f2f5;
+            --text-color: #050505;
+            --container-bg: #ffffff;
+            --container-border: #e0e0e0;
+            --header-bg: #f5f6f7;
+            --header-border: #ddd;
+            --bot-bubble-bg: #e4e6eb;
+            --user-bubble-bg: #ECF2FE; /* Color(0xFFECF2FE) */
+            --user-bubble-text: #050505;
+            --timestamp-color: #65676b;
+            --attachment-border: #ddd;
+            --welcome-icon-filter: none;
+        }
+
+        .dark-mode {
+            /* --- الوضع الداكن (Dark Mode) --- */
+            --bg-color: #18191a;
+            --text-color: #e4e6eb;
+            --container-bg: #242526;
+            --container-border: #3a3b3c;
+            --header-bg: #3a3b3c;
+            --header-border: #444;
+            --bot-bubble-bg: #3a3b3c;
+            --user-bubble-bg: #2A3C5C; /* Color(0xFF2A3C5C) */
+            --user-bubble-text: #e4e6eb;
+            --timestamp-color: #b0b3b8;
+            --attachment-border: #444;
+            --welcome-icon-filter: brightness(0) invert(1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--header-border);
+            background-color: var(--header-bg);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 15px; /* مطابق لحجم الخط في AppBar */
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-body {
+            flex-grow: 1;
+            padding: 10px 8px; /* تقليل المسافة لتكون أقرب للتطبيق */
+            overflow-y: auto;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 4px; /* تقليل المسافة بين الرسائل */
+            max-width: 90%; /* زيادة العرض الأقصى قليلًا */
+        }
+
+        .message.user {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message.bot {
+            margin-right: auto;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user .message-wrapper {
+            align-items: flex-end;
+        }
+
+        .message.bot .message-wrapper {
+            align-items: flex-start;
+        }
+        
+        .bubble {
+            padding: 12px;
+            border-radius: 18px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .message.user .bubble {
+            background-color: var(--user-bubble-bg);
+            color: var(--user-bubble-text);
+        }
+
+        .message.bot .bubble {
+            background-color: var(--bot-bubble-bg);
+            color: var(--text-color);
+        }
+        
+        /* --- تنسيق Markdown --- */
+        .bubble p { margin: 0 0 8px 0; }
+        .bubble p:last-child { margin-bottom: 0; }
+        .bubble ul, .bubble ol { margin: 8px 0; padding-right: 20px; }
+        .bubble li { margin-bottom: 4px; }
+        .bubble a { color: #007bff; text-decoration: underline; }
+        .bubble strong { font-weight: bold; }
+        .bubble em { font-style: italic; }
+        .bubble code {
+            font-family: 'monospace';
+            background-color: rgba(0,0,0,0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .dark-mode .bubble code {
+             background-color: rgba(255,255,255,0.1);
+        }
+
+        .timestamp {
+            font-size: 0.75em;
+            color: var(--timestamp-color);
+            padding: 4px 12px;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--timestamp-color);
+            font-size: 1.1em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* --- تنسيق المرفقات --- */
+        .attachments-container {
+            padding: 0 12px;
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px; /* مطابق للتطبيق */
+            max-width: 250px; /* مطابق للتطبيق */
+        }
+        .message-images img {
+            width: 120px; /* حجم تقريبي */
+            height: 120px;
+            object-fit: cover;
+            border-radius: 16px; /* مطابق للتطبيق */
+            border: 0.5px solid var(--attachment-border);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .message-images img:hover {
+            transform: scale(1.05);
+        }
+
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 0.5px solid var(--attachment-border);
+            width: 220px; /* مطابق للتطبيق */
+            box-sizing: border-box;
+        }
+        .file-attachment img {
+            width: 40px; /* مطابق للتطبيق */
+            height: 40px;
+            margin-left: 8px;
+        }
+        .file-info {
+            overflow: hidden;
+            flex-grow: 1;
+        }
+        .file-info .name {
+            font-size: 14px; /* bodyMedium */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+        .file-info .size {
+            font-size: 11px;
+            color: #65676b; /* grey.shade600 */
+        }
+        .dark-mode .file-info .size {
+            color: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header"><h1 id="chat-title">Think AI</h1></div>
+        <div class="chat-body" id="chat-body">
+            <!-- المحتوى سيتم إضافته هنا بواسطة JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = "e-hr1";
+            const repo = "Think";
+            const branch = "main";
+            const chatBody = document.getElementById('chat-body');
+            const chatTitle = document.getElementById('chat-title');
+
+            // التحقق من الوضع الليلي
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+            }
+
+            const params = new URLSearchParams(window.location.search);
+            const chatId = params.get('id');
+
+            // --- التعديل 1: إعادة التوجيه إذا لم يوجد ID ---
+            if (!chatId) {
+                window.location.href = 'welcome.html';
+                return;
+            }
+
+            chatBody.innerHTML = `<div class="status-message"><p>جاري تحميل المحادثة...</p></div>`;
+            
+            const filePath = `public/chats/${chatId}.json`;
+            const fileUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${filePath}`;
+
+            fetch(fileUrl)
+                .then(r => !r.ok ? new Promise(res => setTimeout(res, 1500)).then(() => fetch(fileUrl + '?t=' + new Date().getTime())) : r)
+                .then(r => { if (!r.ok) throw new Error(`فشل في العثور على المحادثة (الكود: ${r.status}).`); return r.json(); })
+                .then(conversation => displayConversation(conversation))
+                .catch(error => {
+                    console.error(error);
+                    // --- التعديل 2: إعادة التوجيه عند الخطأ مع رسالة ---
+                    const errorMessage = `حدث خطأ: ${error.message}`;
+                    window.location.href = `welcome.html?toast=${encodeURIComponent(errorMessage)}`;
+                });
+        });
 
         function displayConversation(conversation) {
             const chatTitle = document.getElementById('chat-title');
@@ -6,6 +282,7 @@
             chatTitle.textContent = conversation.title || 'محادثة';
             chatBody.innerHTML = '';
 
+            // --- التعديل 2: إعادة التوجيه إذا كانت الرسائل فارغة ---
             if (!conversation.messages || conversation.messages.length === 0) {
                 const errorMessage = "المحادثة فارغة أو تم حذفها.";
                 window.location.href = `welcome.html?toast=${encodeURIComponent(errorMessage)}`;
