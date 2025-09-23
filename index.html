@@ -72,7 +72,7 @@
         .message {
             display: flex;
             margin-bottom: 4px;
-            max-width: 95%; /* زيادة العرض قليلًا */
+            max-width: 95%;
         }
         .message.user {
             margin-left: auto;
@@ -94,7 +94,7 @@
             display: flex;
             flex-direction: column;
             max-width: 100%;
-            overflow: hidden; /* يمنع المحتوى الداخلي من الخروج */
+            overflow: hidden;
         }
         .message.user .message-wrapper { align-items: flex-end; }
         .message.bot .message-wrapper { align-items: flex-start; }
@@ -316,11 +316,9 @@
             function applyDarkMode(e) {
                 if (e.matches) {
                     document.body.classList.add('dark-mode');
-                    // تغيير ثيم highlight.js للوضع المظلم
                     document.querySelector('link[href*="highlight.js"]').href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
                 } else {
                     document.body.classList.remove('dark-mode');
-                    // تغيير ثيم highlight.js للوضع العادي
                     document.querySelector('link[href*="highlight.js"]').href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
                 }
             }
