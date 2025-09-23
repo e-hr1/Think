@@ -10,13 +10,13 @@
     <style>
         :root {
             /* --- الوضع الفاتح (Light Mode) - مطابق لـ ThemeData --- */
-            --bg-color: #FFFFFF; /* scaffoldBackgroundColor */
-            --text-color: #000000; /* textTheme.bodyLarge.color */
+            --bg-color: #FFFFFF;
+            --text-color: #000000;
             --container-bg: #FFFFFF;
-            --header-bg: #FFFFFF; /* appBarTheme.backgroundColor */
+            --header-bg: #FFFFFF;
             --header-border: #E0E0E0;
-            --bot-bubble-bg: #F8F8F8; /* cardColor */
-            --user-bubble-bg: #ECF2FE; /* colorScheme.secondaryContainer (مخصص) */
+            --bot-bubble-bg: #F8F8F8;
+            --user-bubble-bg: #ECF2FE;
             --user-bubble-text: #050505;
             --timestamp-color: #65676b;
             --attachment-border: #ddd;
@@ -25,13 +25,13 @@
 
         .dark-mode {
             /* --- الوضع الداكن (Dark Mode) - مطابق لـ ThemeData --- */
-            --bg-color: #121212; /* scaffoldBackgroundColor */
-            --text-color: #FFFFFF; /* textTheme.bodyLarge.color */
+            --bg-color: #121212;
+            --text-color: #FFFFFF;
             --container-bg: #121212;
-            --header-bg: #121212; /* appBarTheme.backgroundColor */
+            --header-bg: #121212;
             --header-border: #3a3b3c;
-            --bot-bubble-bg: #1E1E1E; /* cardColor */
-            --user-bubble-bg: #2A3C5C; /* colorScheme.secondaryContainer (مخصص) */
+            --bot-bubble-bg: #1E1E1E;
+            --user-bubble-bg: #2A3C5C;
             --user-bubble-text: #e4e6eb;
             --timestamp-color: #b0b3b8;
             --attachment-border: #444;
@@ -71,16 +71,15 @@
 
         .chat-header h1 {
             margin: 0;
-            font-size: 15px; /* مطابق لحجم الخط في AppBar */
-            font-weight: bold; /* مطابق لـ fontWeight.bold */
-            font-family: 'Arial'; /* مطابق لـ fontFamily */
-            color: var(--text-color); /* يتغير مع الوضع */
+            font-size: 15px;
+            font-weight: bold;
+            font-family: 'Arial';
+            color: var(--text-color);
         }
         
         .dark-mode .chat-header h1 {
-            color: #C0C1C9; /* Color.fromARGB(255, 192, 193, 201) */
+            color: #C0C1C9;
         }
-
 
         .chat-body {
             flex-grow: 1;
@@ -116,9 +115,18 @@
             align-items: flex-start;
         }
         
+        /* --- تنسيق اسم المرسل (ThinkAi) --- */
+        .sender-name {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: var(--timestamp-color);
+            padding: 0 12px;
+            margin-bottom: 4px;
+        }
+
         .bubble {
             padding: 12px;
-            border-radius: 18px; /* تطابق الشكل البيضاوي */
+            border-radius: 18px;
             line-height: 1.5;
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -210,7 +218,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- تحديد اتجاه الصفحة بناءً على لغة المتصفح ---
             const userLang = navigator.language || navigator.userLanguage; 
             if (userLang.startsWith('ar')) {
                 document.documentElement.dir = 'rtl';
@@ -224,7 +231,6 @@
             const chatBody = document.getElementById('chat-body');
             const chatTitle = document.getElementById('chat-title');
 
-            // التحقق من الوضع الليلي
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.body.classList.add('dark-mode');
             }
@@ -298,6 +304,14 @@
                 const wrapperEl = document.createElement('div');
                 wrapperEl.className = 'message-wrapper';
 
+                // --- التعديل الرئيسي هنا: إضافة اسم المرسل للبوت ---
+                if (!msg.isUser) {
+                    const senderNameEl = document.createElement('div');
+                    senderNameEl.className = 'sender-name';
+                    senderNameEl.textContent = 'ThinkAi';
+                    wrapperEl.appendChild(senderNameEl);
+                }
+
                 const attachmentsEl = document.createElement('div');
                 attachmentsEl.className = 'attachments-container';
 
@@ -337,12 +351,9 @@
                     const bubbleEl = document.createElement('div');
                     bubbleEl.className = 'bubble';
                     
-                    // --- التعديل الرئيسي هنا ---
-                    // طبق Markdown فقط إذا كانت الرسالة من البوت
                     if (!msg.isUser) {
                         bubbleEl.innerHTML = marked.parse(msg.text);
                     } else {
-                        // لرسائل المستخدم، استخدم النص كما هو للحماية من إدخال HTML
                         bubbleEl.textContent = msg.text;
                     }
                     
