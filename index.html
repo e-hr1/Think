@@ -4,52 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>عرض المحادثة</title>
-    
-    <!-- 1. مكتبة Marked لتحويل Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- 2. مكتبة Highlight.js لتلوين الأكواد -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <!-- مكتبة لتمييز الأكواد البرمجية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    
-    <!-- 3. مكتبة Clipboard.js لزر النسخ -->
-    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script>
 
     <style>
         :root {
-            /* --- الوضع الفاتح (Light Mode) --- */
-            --bg-color: #f4f7f9;
-            --text-color: #2d3748;
-            --container-bg: #ffffff;
-            --header-bg: #ffffff;
-            --header-border: #e2e8f0;
-            --user-bubble-bg: #4A90E2;
-            --user-bubble-text: #ffffff;
-            --bot-bubble-bg: #f7fafc;
-            --timestamp-color: #a0aec0;
-            --scroll-thumb-bg: #cbd5e0;
-            --code-bg: #282c34; /* لون خلفية الكود من ثيم atom-one-dark */
-            --table-border: #e2e8f0;
-            --table-header-bg: #edf2f7;
+            --bg-color: #f0f2f5; --text-color: #050505; --container-bg: #ffffff; --container-border: #e0e0e0; --header-bg: #f5f6f7; --header-border: #ddd; --bot-bubble-bg: transparent; --user-bubble-bg: #ECF2FE; --user-bubble-text: #050505; --timestamp-color: #65676b; --attachment-border: #ddd; --welcome-icon-filter: none;
+            /* متغيرات جديدة للتصميم الفخم */
+            --code-bg: #1e1e1e;
+            --code-header-bg: #333;
+            --code-text-color: #d4d4d4;
+            --table-border-color: #e0e0e0;
+            --table-header-bg: #f9f9f9;
+            --table-row-hover: #f1f1f1;
         }
-
         .dark-mode {
-            /* --- الوضع الداكن (Dark Mode) --- */
-            --bg-color: #1a202c;
-            --text-color: #e2e8f0;
-            --container-bg: #2d3748;
-            --header-bg: #2d3748;
-            --header-border: #4a5568;
-            --user-bubble-bg: #2b6cb0;
-            --user-bubble-text: #e2e8f0;
-            --bot-bubble-bg: #4a5568;
-            --timestamp-color: #718096;
-            --scroll-thumb-bg: #4a5568;
-            --code-bg: #282c34;
-            --table-border: #4a5568;
-            --table-header-bg: #1a202c;
+            --bg-color: #18191a; --text-color: #e4e6eb; --container-bg: #242526; --container-border: #3a3b3c; --header-bg: #3a3b3c; --header-border: #444; --bot-bubble-bg: transparent; --user-bubble-bg: #2A3C5C; --user-bubble-text: #e4e6eb; --timestamp-color: #b0b3b8; --attachment-border: #444; --welcome-icon-filter: brightness(0) invert(1);
+            /* متغيرات الوضع المظلم */
+            --code-bg: #252526;
+            --code-header-bg: #3a3b3c;
+            --code-text-color: #e4e6eb;
+            --table-border-color: #444;
+            --table-header-bg: #3a3b3c;
+            --table-row-hover: #4a4b4c;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--bg-color);
@@ -59,24 +39,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0 10px;
-            box-sizing: border-box;
         }
-
         .chat-container {
             width: 100%;
             max-width: 800px;
             background-color: var(--container-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             height: 100%;
-            max-height: 95vh; /* تعديل بسيط لإظهار الظل */
-            border: 1px solid var(--header-border);
+            max-height: 100vh;
         }
-
         .chat-header {
             padding: 15px 20px;
             border-bottom: 1px solid var(--header-border);
@@ -84,176 +59,243 @@
             text-align: center;
             flex-shrink: 0;
         }
-
         .chat-header h1 {
             margin: 0;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
-
         .chat-body {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 10px 8px;
         }
-        /* تصميم شريط التمرير */
-        .chat-body::-webkit-scrollbar { width: 8px; }
-        .chat-body::-webkit-scrollbar-track { background: transparent; }
-        .chat-body::-webkit-scrollbar-thumb { background-color: var(--scroll-thumb-bg); border-radius: 20px; border: 3px solid var(--container-bg); }
-
         .message {
             display: flex;
-            margin-bottom: 16px;
-            max-width: 95%;
+            margin-bottom: 4px;
+            max-width: 90%;
         }
-        .message.user { margin-left: auto; flex-direction: row-reverse; }
-        .message.bot { margin-right: auto; align-items: flex-start; gap: 10px; }
-
+        .message.user {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+        .message.bot {
+            margin-right: auto;
+            align-items: flex-start;
+            gap: 8px;
+        }
         .bot-avatar {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             flex-shrink: 0;
             margin-top: 4px;
-            border: 2px solid var(--container-bg);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-
-        .message-wrapper { display: flex; flex-direction: column; }
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 100%; /* السماح للمحتوى بالتمدد */
+        }
         .message.user .message-wrapper { align-items: flex-end; }
         .message.bot .message-wrapper { align-items: flex-start; }
-        
         .bubble {
-            padding: 10px 16px;
-            border-radius: 20px;
-            line-height: 1.6;
+            padding: 12px;
+            border-radius: 18px;
+            line-height: 1.5;
+            white-space: pre-wrap;
             word-wrap: break-word;
         }
         .message.user .bubble {
             background-color: var(--user-bubble-bg);
             color: var(--user-bubble-text);
-            border-bottom-right-radius: 5px;
         }
         .message.bot .bubble {
             background-color: var(--bot-bubble-bg);
             color: var(--text-color);
-            border-bottom-left-radius: 5px;
         }
-        
+        .message.bot .bubble p { margin: 0 0 8px 0; }
+        .message.bot .bubble p:last-child { margin-bottom: 0; }
+        .message.bot .bubble ul, .message.bot .bubble ol { margin: 8px 0; padding-right: 20px; }
+        .message.bot .bubble li { margin-bottom: 4px; }
+        .message.bot .bubble a { color: #007bff; text-decoration: underline; }
+        .message.bot .bubble strong { font-weight: bold; }
+        .message.bot .bubble em { font-style: italic; }
+        .message.bot .bubble code {
+            font-family: 'monospace';
+            background-color: rgba(0,0,0,0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .dark-mode .message.bot .bubble code { background-color: rgba(255,255,255,0.1); }
         .timestamp {
-            font-size: 0.7rem;
+            font-size: 0.75em;
             color: var(--timestamp-color);
             padding: 4px 12px;
         }
+        .status-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--timestamp-color);
+            font-size: 1.1em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .attachments-container {
+            padding: 0 12px;
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .message-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            max-width: 250px;
+        }
+        .message-images img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 0.5px solid var(--attachment-border);
+            cursor: default;
+            transition: transform 0.2s;
+        }
+        .message-images img:hover {
+            transform: scale(1.05);
+        }
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 0.5px solid var(--attachment-border);
+            width: 220px;
+            box-sizing: border-box;
+        }
+        .file-attachment img {
+            width: 40px;
+            height: 40px;
+            margin-left: 8px;
+        }
+        .file-info {
+            overflow: hidden;
+            flex-grow: 1;
+        }
+        .file-info .name {
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+        .file-info .size {
+            font-size: 11px;
+            color: #65676b;
+        }
+        .dark-mode .file-info .size { color: #a0a0a0; }
 
-        /* --- تنسيق المحتوى المتقدم داخل رسائل البوت --- */
-        .message.bot .bubble p { margin: 0 0 10px 0; }
-        .message.bot .bubble p:last-child { margin-bottom: 0; }
-        .message.bot .bubble ul, .message.bot .bubble ol { margin: 10px 0; padding-right: 25px; }
-        .message.bot .bubble li { margin-bottom: 5px; }
-        .message.bot .bubble a { color: #3182ce; text-decoration: none; font-weight: 500; }
-        .message.bot .bubble a:hover { text-decoration: underline; }
-        .dark-mode .message.bot .bubble a { color: #63b3ed; }
+        /* --- بداية تنسيقات الجداول والأكواد الفخمة --- */
 
-        /* --- تنسيق الجداول الفخم --- */
+        /* تنسيق الجداول */
         .message.bot .bubble table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 16px 0;
             font-size: 0.9em;
-            border: 1px solid var(--table-border);
             border-radius: 8px;
-            overflow: hidden; /* لضمان تطبيق الحواف الدائرية */
+            overflow: hidden; /* لإخفاء زوايا aلـ th/td الحادة */
+            border: 1px solid var(--table-border-color);
         }
         .message.bot .bubble th, .message.bot .bubble td {
             padding: 12px 15px;
             text-align: right;
-            border-bottom: 1px solid var(--table-border);
+            border-bottom: 1px solid var(--table-border-color);
         }
         .message.bot .bubble th {
             background-color: var(--table-header-bg);
             font-weight: 600;
             color: var(--text-color);
         }
-        .message.bot .bubble tr:last-child td {
+        .message.bot .bubble tr {
+            background-color: var(--container-bg);
+        }
+        .message.bot .bubble tr:last-of-type td {
             border-bottom: none;
         }
-        .message.bot .bubble tr:nth-of-type(even) {
-            background-color: var(--bg-color);
+        .message.bot .bubble tr:hover {
+            background-color: var(--table-row-hover);
         }
-        .dark-mode .message.bot .bubble tr:nth-of-type(even) {
-            background-color: #273041;
+        .table-wrapper {
+            overflow-x: auto; /* للسماح بالتمرير الأفقي للجداول الكبيرة */
+            margin: 1em 0;
         }
 
-        /* --- تنسيق بلوك الكود الفخم --- */
-        .code-block-wrapper {
-            position: relative;
-            margin: 15px 0;
-        }
+        /* تنسيق بلوكات الأكواد */
         .message.bot .bubble pre {
             background-color: var(--code-bg);
             border-radius: 8px;
-            padding: 16px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 0.9em;
-            line-height: 1.5;
-            margin: 0; /* إزالة الهامش الافتراضي من pre */
+            margin: 16px 0;
+            overflow: hidden;
+            direction: ltr; /* الأكواد دائمًا من اليسار لليمين */
+            position: relative;
         }
-        .message.bot .bubble pre code {
-            padding: 0;
-            background: none;
-            border-radius: 0;
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--code-header-bg);
+            padding: 8px 12px;
+            color: #ccc;
+            font-size: 0.8em;
         }
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            left: 10px; /* في اليسار بسبب dir=rtl */
+        .copy-button {
             background-color: #555;
             color: white;
             border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
+            padding: 5px 10px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.2s, background-color 0.2s;
+            font-size: 0.9em;
+            transition: background-color 0.2s;
         }
-        .code-block-wrapper:hover .copy-btn {
-            opacity: 1;
-        }
-        .copy-btn:hover {
+        .copy-button:hover {
             background-color: #666;
         }
-        .copy-btn.copied {
-            background-color: #28a745; /* أخضر للنجاح */
+        .copy-button.copied {
+            background-color: #28a745; /* اللون الأخضر للتأكيد */
         }
-        
-        /* ... (باقي التنسيقات للمرفقات والصور كما هي) ... */
-        .message-images img { cursor: default; }
+        .message.bot .bubble pre code {
+            display: block;
+            padding: 16px;
+            color: var(--code-text-color);
+            white-space: pre;
+            overflow-x: auto;
+            background-color: transparent; /* الخلفية الآن على pre */
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', 'monospace';
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        /* --- نهاية تنسيقات الجداول والأكواد --- */
+
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header"><h1 id="chat-title">Think AI</h1></div>
         <div class="chat-body" id="chat-body">
-            <!-- المحتوى الديناميكي -->
+            <!-- المحتوى سيتم إضافته هنا بواسطة JavaScript -->
         </div>
     </div>
 
     <script>
-        // إعداد Marked.js ليعمل مع Highlight.js
-        marked.setOptions({
-            highlight: function(code, lang) {
-                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-                return hljs.highlight(code, { language }).value;
-            },
-            langPrefix: 'hljs language-' // للتوافق مع CSS الخاص بـ highlight.js
-        });
-
         document.addEventListener('DOMContentLoaded', function() {
-            // ... (كود تحميل المحادثة من GitHub كما هو)
             const username = "e-hr1";
             const repo = "Think";
             const branch = "main";
@@ -295,7 +337,8 @@
             chatBody.innerHTML = '';
 
             if (!conversation.messages || conversation.messages.length === 0) {
-                // ... (نفس كود التعامل مع الخطأ)
+                const errorMessage = "المحادثة فارغة أو تم حذفها.";
+                window.location.href = `welcome.html?toast=${encodeURIComponent(errorMessage)}`;
                 return;
             }
 
@@ -304,11 +347,23 @@
             const branch = "main";
             const botAvatarUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/public/assets/icons/icon_thinkapp.png`;
 
+            function getIconUrl(fileType) {
+                const iconMap = {
+                    'pdf': 'icon_file_pdf.png', 'word': 'icon_word.png', 'excel': 'icon_exel.png',
+                    'pptx': 'icon_pptx.png', 'txt': 'icon_txt.png', 'code': 'icon_file_code.png'
+                };
+                const iconName = iconMap[fileType] || 'icon_file_code.png';
+                return `https://raw.githubusercontent.com/${username}/${repo}/${branch}/public/assets/icons/${iconName}`;
+            }
+
             conversation.messages.forEach(msg => {
-                // ... (نفس كود إنشاء الرسائل الأساسي)
+                if (!msg.text && (!msg.imageUrls || msg.imageUrls.length === 0) && (!msg.attachedFiles || msg.attachedFiles.length === 0)) {
+                    return;
+                }
+
                 const messageEl = document.createElement('div');
                 messageEl.className = `message ${msg.isUser ? 'user' : 'bot'}`;
-                
+
                 if (!msg.isUser) {
                     const avatarImg = document.createElement('img');
                     avatarImg.src = botAvatarUrl;
@@ -319,6 +374,38 @@
                 const wrapperEl = document.createElement('div');
                 wrapperEl.className = 'message-wrapper';
 
+                const attachmentsEl = document.createElement('div');
+                attachmentsEl.className = 'attachments-container';
+
+                if (msg.imageUrls && msg.imageUrls.length > 0) {
+                    const imagesContainer = document.createElement('div');
+                    imagesContainer.className = 'message-images';
+                    if (msg.isUser) { imagesContainer.style.justifyContent = 'flex-end'; }
+                    msg.imageUrls.forEach(url => {
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.alt = 'صورة مرفقة';
+                        imagesContainer.appendChild(img);
+                    });
+                    attachmentsEl.appendChild(imagesContainer);
+                }
+
+                if (msg.attachedFiles && msg.attachedFiles.length > 0) {
+                    msg.attachedFiles.forEach(file => {
+                        const fileDiv = document.createElement('div');
+                        fileDiv.className = 'file-attachment';
+                        fileDiv.innerHTML = `
+                            <img src="${getIconUrl(file.type)}" alt="${file.type} icon">
+                            <div class="file-info">
+                                <div class="name">${file.name}</div>
+                                <div class="size">${file.size}</div>
+                            </div>`;
+                        attachmentsEl.appendChild(fileDiv);
+                    });
+                }
+                
+                if (msg.isUser) { wrapperEl.appendChild(attachmentsEl); }
+
                 if (msg.text && msg.text.trim() !== '') {
                     const bubbleEl = document.createElement('div');
                     bubbleEl.className = 'bubble';
@@ -326,13 +413,19 @@
                     if (msg.isUser) {
                         bubbleEl.textContent = msg.text;
                     } else {
-                        bubbleEl.innerHTML = marked.parse(msg.text);
+                        bubbleEl.innerHTML = marked.parse(msg.text, {
+                            highlight: function(code, lang) {
+                                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                                return hljs.highlight(code, { language, ignoreIllegals: true }).value;
+                            }
+                        });
                     }
                     
                     wrapperEl.appendChild(bubbleEl);
                 }
                 
-                // ... (كود المرفقات والتوقيت)
+                if (!msg.isUser) { wrapperEl.appendChild(attachmentsEl); }
+
                 const timestampEl = document.createElement('div');
                 timestampEl.className = 'timestamp';
                 timestampEl.textContent = new Date(msg.timestamp).toLocaleString('ar-SA', { hour: 'numeric', minute: 'numeric', hour12: true });
@@ -342,59 +435,64 @@
                 chatBody.appendChild(messageEl);
             });
 
-            // --- إضافة أزرار النسخ بعد عرض المحادثة ---
-            addCopyButtons();
+            // استدعاء الدالة الجديدة بعد عرض المحتوى
+            enhanceCodeBlocks();
+            wrapTables();
         }
 
-        function addCopyButtons() {
-            const codeBlocks = document.querySelectorAll('.message.bot pre');
-            codeBlocks.forEach((block, index) => {
-                // إنشاء حاوية جديدة لتغليف بلوك الكود وزر النسخ
-                const wrapper = document.createElement('div');
-                wrapper.className = 'code-block-wrapper';
+        // --- بداية الدوال الجديدة لتصميم الأكواد والجداول ---
 
-                // نقل بلوك الكود إلى داخل الحاوية الجديدة
-                block.parentNode.insertBefore(wrapper, block);
-                wrapper.appendChild(block);
+        function enhanceCodeBlocks() {
+            document.querySelectorAll('.message.bot .bubble pre').forEach(preElement => {
+                const codeElement = preElement.querySelector('code');
+                if (!codeElement) return;
 
-                // إنشاء زر النسخ
+                // الحصول على اللغة من الكلاس (e.g., language-javascript)
+                const langClass = Array.from(codeElement.classList).find(c => c.startsWith('language-'));
+                const lang = langClass ? langClass.replace('language-', '') : 'code';
+
+                // إنشاء الشريط العلوي
+                const header = document.createElement('div');
+                header.className = 'code-header';
+
+                const langName = document.createElement('span');
+                langName.textContent = lang;
+
                 const copyButton = document.createElement('button');
-                copyButton.className = 'copy-btn';
+                copyButton.className = 'copy-button';
                 copyButton.textContent = 'نسخ';
-                
-                // تعيين ID فريد لبلوك الكود لربطه مع زر النسخ
-                const codeId = `code-${index}`;
-                block.id = codeId;
-                copyButton.setAttribute('data-clipboard-target', `#${codeId} code`);
 
-                // إضافة الزر إلى الحاوية
-                wrapper.appendChild(copyButton);
-            });
+                header.appendChild(langName);
+                header.appendChild(copyButton);
 
-            // تفعيل clipboard.js
-            const clipboard = new ClipboardJS('.copy-btn');
+                // إضافة الشريط العلوي قبل عنصر الكود داخل <pre>
+                preElement.insertBefore(header, preElement.firstChild);
 
-            clipboard.on('success', function(e) {
-                const button = e.trigger;
-                button.textContent = 'تم النسخ!';
-                button.classList.add('copied');
-                
-                setTimeout(() => {
-                    button.textContent = 'نسخ';
-                    button.classList.remove('copied');
-                }, 2000); // إعادة النص الأصلي بعد ثانيتين
-
-                e.clearSelection();
-            });
-
-            clipboard.on('error', function(e) {
-                const button = e.trigger;
-                button.textContent = 'خطأ!';
-                setTimeout(() => {
-                    button.textContent = 'نسخ';
-                }, 2000);
+                // إضافة وظيفة النسخ
+                copyButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(codeElement.innerText).then(() => {
+                        copyButton.textContent = 'تم النسخ!';
+                        copyButton.classList.add('copied');
+                        setTimeout(() => {
+                            copyButton.textContent = 'نسخ';
+                            copyButton.classList.remove('copied');
+                        }, 2000);
+                    });
+                });
             });
         }
+
+        function wrapTables() {
+            document.querySelectorAll('.message.bot .bubble table').forEach(table => {
+                if (table.parentNode.classList.contains('table-wrapper')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-wrapper';
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
+        }
+        // --- نهاية الدوال الجديدة ---
+
     </script>
 </body>
 </html>
