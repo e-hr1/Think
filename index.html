@@ -64,40 +64,48 @@
             const params = new URLSearchParams(window.location.search);
             const gistId = params.get('gist_id');
 
-            // الحالة 1: لا يوجد Gist ID في الرابط
             if (!gistId) {
                 statusMessage.textContent = t.no_link_found;
-                // لا نعرض Toast هنا لأن المستخدم لم يأتِ من رابط مشاركة أصلاً
                 setTimeout(() => { window.location.href = 'welcome.html'; }, 1500);
                 return;
             }
 
             try {
-                // الحالة 2: التحقق من صلاحية الرابط
                 const response = await fetch(`https://api.github.com/gists/${gistId}`);
                 if (!response.ok) {
                     throw new Error('Link expired or invalid.');
                 }
 
-                // الرابط صالح، حاول فتح التطبيق
                 statusMessage.textContent = t.status_verified;
                 const deepLink = `think://open?gist_id=${gistId}`;
 
-                // إذا لم يفتح التطبيق، سيتم إعادة التوجيه إلى صفحة الترحيب
+                // *** بداية التعديل ***
+                // متغير لتتبع ما إذا كان يجب إعادة التوجيه
+                let shouldRedirect = true;
+
+                // دالة لإلغاء إعادة التوجيه إذا غادر المستخدم الصفحة (مما يعني أن التطبيق قد فتح)
+                const onBlur = () => {
+                    shouldRedirect = false;
+                };
+                window.addEventListener('blur', onBlur);
+
+                // إذا لم يفتح التطبيق بعد 2.5 ثانية، سيتم إعادة التوجيه إلى صفحة الترحيب
                 setTimeout(() => {
-                    window.location.href = 'welcome.html';
+                    // قم بإزالة المستمع لتجنب تسرب الذاكرة
+                    window.removeEventListener('blur', onBlur);
+                    if (shouldRedirect) {
+                        window.location.href = 'welcome.html';
+                    }
                 }, 2500);
+                // *** نهاية التعديل ***
 
                 // محاولة فتح الرابط العميق
                 window.location.href = deepLink;
 
             } catch (error) {
-                // *** التعديل الرئيسي هنا ***
-                // الحالة 3: فشل التحقق من الرابط (خطأ في الشبكة أو الرابط غير صالح)
                 console.error(error);
                 statusMessage.textContent = t.link_expired;
                 
-                // إعادة التوجيه إلى صفحة الترحيب مع تمرير مفتاح رسالة الـ Toast
                 setTimeout(() => {
                     window.location.href = 'welcome.html?toast=toastLinkExpired';
                 }, 1500);
