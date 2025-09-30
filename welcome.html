@@ -4,8 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 1. أيقونة الموقع (Favicon) -->
+    <link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
+    
     <!-- The title will be set dynamically -->
-    <title>Think AI Advertisement</title>
+    <title>Think AI</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Roboto:wght@400;700&display=swap');
 
@@ -13,9 +17,7 @@
             margin: 0;
             padding: 0;
             width: 100%;
-            /* --- التعديل الرئيسي هنا --- */
             min-height: 100vh; 
-            /* ------------------------- */
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(to bottom, #ffffff, #f2e6ff);
             color: #333;
@@ -31,7 +33,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            min-height: 100vh; /* هذا يضمن أن المحتوى نفسه يملأ الشاشة عمودياً */
+            min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
@@ -94,12 +96,15 @@
             margin-bottom: 30px;
         }
 
+        /* 2. تصميم زر التحميل الجديد */
         .download-button {
-            display: inline-block;
+            display: inline-flex; /* Use flex to align icon and text */
+            align-items: center;
+            gap: 12px; /* Space between icon and text */
             background-color: #8a2be2;
             color: #fff;
-            padding: 15px 35px;
-            font-size: 20px;
+            padding: 12px 30px;
+            font-size: 18px;
             font-weight: bold;
             border-radius: 50px;
             text-decoration: none;
@@ -113,6 +118,11 @@
             background-color: #7b1fa2;
             transform: translateY(-2px);
         }
+        
+        .download-button svg {
+            width: 24px;
+            height: 24px;
+        }
 
         .app-mockup {
             width: 100%;
@@ -120,11 +130,12 @@
             margin-top: 40px;
         }
         
+        /* 3. تصميم الـ Toast */
         .toast {
             visibility: hidden;
             min-width: 250px;
             max-width: 90%;
-            background-color: #d32f2f;
+            background-color: #323232; /* لون داكن للـ Toast */
             color: #fff;
             text-align: center;
             border-radius: 8px;
@@ -134,9 +145,9 @@
             left: 50%;
             transform: translateX(-50%);
             bottom: 30px;
-            font-size: 17px;
+            font-size: 16px;
             opacity: 0;
-            transition: all 0.5s ease-in-out;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); /* حركة أنعم */
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
@@ -164,7 +175,14 @@
             <h1 data-i18n="mainHeading"></h1>
             <h2 data-i18n="subHeading"></h2>
             <p data-i18n="description"></p>
-            <a href="#" class="download-button" data-i18n="downloadButton"></a>
+            
+            <!-- 4. زر التحميل المحدث مع أيقونة SVG -->
+            <button class="download-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+                    <path d="M3.26,2.77C3.57,2.3,4.1,2,4.7,2h14.6c0.6,0,1.13,0.3,1.44,0.77l-7.9,7.9L3.26,2.77z M20.74,10.67L12.84,18.57c-0.4,0.4-1.08,0.4-1.48,0L3.26,10.67l7.9,7.9L20.74,10.67z M2.77,3.26C2.3,3.57,2,4.1,2,4.7v14.6c0,0.6,0.3,1.13,0.77,1.44l7.9-7.9L2.77,3.26z M21.23,20.74c0.47-0.31,0.77-0.84,0.77-1.44V4.7c0-0.6-0.3-1.13-0.77-1.44l-7.9,7.9L21.23,20.74z"/>
+                </svg>
+                <span data-i18n="downloadButton"></span>
+            </button>
         </div>
 
         <img src="public/assets/icons/app-mockup.png" alt="App Mockup" class="app-mockup" data-i18n-alt="mockupAlt">
@@ -173,69 +191,74 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- 1. Language Dictionary ---
+            // --- 1. قاموس النصوص (مع تعديلات) ---
             const translations = {
                 en: {
-                    pageTitle: "Think AI Advertisement",
-                    appIconAlt: "App Icon",
-                    mainHeading: "An All-in-One AI Assistant",
+                    pageTitle: "Think AI - Your Personal AI Assistant",
+                    appIconAlt: "Think AI App Icon",
+                    mainHeading: "Your All-in-One AI Assistant",
                     subHeading: "Personal, Fast, and Free",
                     description: "Discover Think AI, your smart companion that helps you organize tasks, answer queries, and boost your productivity with its advanced features and ease of use.",
-                    downloadButton: "Get the Android App",
+                    downloadButton: "Get on Google Play",
                     mockupAlt: "App interface mockups",
-                    toastDefaultError: "An unknown error occurred."
+                    toastLinkExpired: "The link has expired or is invalid."
                 },
                 ar: {
-                    pageTitle: "إعلان Think AI",
-                    appIconAlt: "أيقونة التطبيق",
-                    mainHeading: "مساعد Ai، شامل",
+                    pageTitle: "Think AI - مساعدك الذكي الشخصي",
+                    appIconAlt: "أيقونة تطبيق Think AI",
+                    mainHeading: "مساعدك الذكي الشامل",
                     subHeading: "شخصي، سريع، ومجاني",
-                    description: "اكتشف تطبيق Think AI، رفيقك الذكي الذي يساعدك في تنظيم مهامك، والإجابة على استفساراتك، وتعزيز إنتاجيتك بفضل ميزاته المتقدمة وسهولة استخدامه.",
-                    downloadButton: "احصل على تطبيق أندرويد",
+                    description: "اكتشف Think AI، رفيقك الذكي الذي يساعدك في تنظيم مهامك، والإجابة على استفساراتك، وتعزيز إنتاجيتك بفضل ميزاته المتقدمة وسهولة استخدامه.",
+                    downloadButton: "متوفر على Google Play",
                     mockupAlt: "نماذج لواجهة التطبيق",
-                    toastDefaultError: "حدث خطأ غير معروف."
+                    toastLinkExpired: "الرابط منتهي الصلاحية أو غير صالح."
                 }
             };
 
-            // --- 2. Detect Language ---
-            const userLang = navigator.language.split('-')[0];
+            // --- 2. تحديد اللغة وتطبيق النصوص ---
+            const userLang = (navigator.language || navigator.userLanguage).split('-')[0];
             const lang = userLang === 'ar' ? 'ar' : 'en';
+            const t = translations[lang];
 
-            // --- 3. Apply Translations and Attributes ---
-            const htmlEl = document.documentElement;
-            htmlEl.lang = lang;
-            htmlEl.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            
-            document.title = translations[lang].pageTitle;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.title = t.pageTitle;
 
-            document.querySelectorAll('[data-i18n]').forEach(element => {
-                const key = element.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    element.textContent = translations[lang][key];
-                }
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+            document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+                const key = el.getAttribute('data-i18n-alt');
+                if (t[key]) el.alt = t[key];
             });
 
-            document.querySelectorAll('[data-i18n-alt]').forEach(element => {
-                const key = element.getAttribute('data-i18n-alt');
-                if (translations[lang][key]) {
-                    element.alt = translations[lang][key];
-                }
-            });
-
-            // --- 4. Handle Toast Message ---
+            // --- 3. التعامل مع رسالة الـ Toast ---
             const params = new URLSearchParams(window.location.search);
-            const toastMessage = params.get('toast');
-
-            if (toastMessage) {
+            const toastKey = params.get('toast');
+            if (toastKey && t[toastKey]) {
                 const toastElement = document.getElementById('toast');
-                const decodedMessage = decodeURIComponent(toastMessage);
-                toastElement.textContent = translations[lang][decodedMessage] || decodedMessage;
-                
+                toastElement.textContent = t[toastKey];
                 toastElement.className = "toast show";
-                setTimeout(function(){ 
+                setTimeout(() => { 
                     toastElement.className = toastElement.className.replace("show", ""); 
                 }, 4000);
             }
+
+            // --- 5. منطق النقر على زر التحميل ---
+            const downloadButton = document.querySelector('.download-button');
+            downloadButton.addEventListener('click', function() {
+                const deepLink = 'think://open'; // رابط عام لفتح التطبيق
+                const playStoreLink = 'https://play.google.com/store/apps/details?id=tech.think.app';
+
+                // محاولة فتح التطبيق
+                window.location.href = deepLink;
+
+                // بعد فترة قصيرة، إذا لم يفتح التطبيق، قم بالتوجيه إلى متجر بلاي
+                setTimeout(() => {
+                    window.location.href = playStoreLink;
+                }, 2500);
+            });
         });
     </script>
 
