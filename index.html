@@ -4,20 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فتح تطبيق Think</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h2>اضغط الزر لفتح التطبيق</h2>
-    <button id="openApp" style="padding:10px 20px; font-size:16px;">فتح التطبيق</button>
+    <h2>اضغط الزر لفتح تطبيق Think</h2>
+    <button id="openApp">فتح التطبيق</button>
 
     <script>
-        const appScheme = "https://e-hr1.github.io/Think";
+        // الرابط المخصص للتطبيق (Custom Scheme)
+        const appScheme = "think://open";
+
+        // الرابط البديل إذا لم يكن التطبيق مثبت
         const fallbackURL = "https://e-hr1.github.io/Think";
 
         document.getElementById("openApp").addEventListener("click", function() {
             // محاولة فتح التطبيق
             window.location = appScheme;
 
-            // إذا لم يكن التطبيق مثبت، بعد ثانية نفتح الموقع
+            // بعد ثانية واحدة، إذا لم يفتح التطبيق، يفتح الموقع
             setTimeout(() => {
                 window.location = fallbackURL;
             }, 1000);
