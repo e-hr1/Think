@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فتح تطبيق Think</title>
-    <style>
-        body { text-align:center; font-family:Arial,sans-serif; margin-top:50px; }
-        button { padding:12px 24px; font-size:18px; cursor:pointer; background:#007bff; color:#fff; border:none; border-radius:8px; }
-        button:hover { background:#0056b3; }
-    </style>
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+        window.onload = function() {
+            // استخلاص Gist ID من رابط الصفحة
+            const params = new URLSearchParams(window.location.search);
+            const gistId = params.get('gist_id');
+
+            if (gistId) {
+                // إنشاء الرابط العميق الخاص بالتطبيق
+                const deepLink = 'think://open?gist_id=' + gistId;
+                // إعادة التوجيه إلى التطبيق
+                window.location.href = deepLink;
+
+                // (اختياري) يمكنك إضافة زر احتياطي في حال لم تعمل إعادة التوجيه التلقائي
+                document.getElementById('message').innerHTML = 
+                    'If you are not redirected automatically, <a href="' + deepLink + '">click here to open the app</a>.';
+            } else {
+                document.getElementById('message').innerText = 'No conversation link found.';
+            }
+        };
+    </script>
 </head>
 <body>
-    <h2>اضغط الزر لفتح تطبيق Think</h2>
-    <button id="openApp">فتح التطبيق</button>
-
-    <script>
-        const appScheme = "think://open";  // رابط التطبيق
-        const fallbackURL = "https://e-hr1.github.io/Think"; // الموقع البديل
-
-        document.getElementById("openApp").addEventListener("click", () => {
-            window.location = appScheme; // محاولة فتح التطبيق
-            setTimeout(() => {           // إذا لم يفتح بعد ثانية
-                window.location = fallbackURL; // يفتح الموقع
-            }, 1000);
-        });
-    </script>
+    <p id="message">Redirecting to the app...</p>
 </body>
 </html>
