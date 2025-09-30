@@ -1,49 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-    <!-- ... نفس كود الـ style ... -->
+    <title>فتح تطبيق Think</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Opening Think AI...</h1>
-        <div class="spinner"></div>
-        <p>If you are not redirected automatically, <a id="fallback-link" href="#">click here</a>.</p>
-    </div>
+    <h2>اضغط الزر لفتح التطبيق</h2>
+    <button id="openApp" style="padding:10px 20px; font-size:16px;">فتح التطبيق</button>
 
     <script>
-        (function() {
-            const params = new URLSearchParams(window.location.search);
-            const gistId = params.get('gist_id');
+        const appScheme = "https://e-hr1.github.io/Think";
+        const fallbackURL = "https://e-hr1.github.io/Think";
 
-            if (!gistId) {
-                document.querySelector('h1').innerText = 'Error';
-                document.querySelector('p').innerText = 'Gist ID is missing from the URL.';
-                document.querySelector('.spinner').style.display = 'none';
-                return;
-            }
+        document.getElementById("openApp").addEventListener("click", function() {
+            // محاولة فتح التطبيق
+            window.location = appScheme;
 
-            // ✅✅✅ التعديل الرئيسي هنا ✅✅✅
-            // الرابط الذي يفتح التطبيق هو نفس رابط HTTPS الذي تم تسجيله في AndroidManifest
-            const appOpenUrl = `https://e-hr1.github.io/Think/?gist_id=${gistId}`;
-            
-            // الرابط الاحتياطي في حال عدم تثبيت التطبيق
-            const fallbackUrl = `https://e-hr1.github.io/Think-App/?gist_id=${gistId}`;
-
-            document.getElementById('fallback-link').href = fallbackUrl;
-
-            // محاولة فتح التطبيق باستخدام رابط HTTPS
-            window.location.href = appOpenUrl;
-
-            // تعيين مؤقت للتوجيه إلى الرابط الاحتياطي
-            setTimeout(function() {
-                window.location.href = fallbackUrl;
-            }, 1500);
-
-        })();
+            // إذا لم يكن التطبيق مثبت، بعد ثانية نفتح الموقع
+            setTimeout(() => {
+                window.location = fallbackURL;
+            }, 1000);
+        });
     </script>
-
 </body>
 </html>
