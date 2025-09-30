@@ -1,29 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <title>Redirecting...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 1. أيقونة التطبيق للمعاينة وتبويب المتصفح (Favicon & Open Graph) -->
+    <!-- تأكد من أن هذا المسار صحيح داخل مستودع GitHub الخاص بك -->
+    <link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
+    <meta property="og:image" content="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icons/icon_thinkapp.png">
+    <meta property="og:title" content="فتح في تطبيق Think AI">
+    <meta property="og:description" content="مشاركة محتوى من تطبيق Think AI. انقر لفتح المحتوى في التطبيق.">
+    <meta name="twitter:card" content="summary">
+
+    <title>جاري الفتح في تطبيق Think AI...</title>
+
+    <!-- 2. تصميم مؤشر التحميل (CSS) -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            padding: 20px;
+        }
+        .loader {
+            border: 5px solid #f3f3f3; /* Light grey */
+            border-top: 5px solid #4D6BFF; /* لون التطبيق */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #status-message {
+            font-size: 18px;
+            color: #555;
+        }
+        #fallback-link {
+            display: none; /* يظهر فقط عند الحاجة */
+            margin-top: 20px;
+            font-size: 14px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loader"></div>
+        <p id="status-message">جاري التحقق من الرابط والفتح في التطبيق...</p>
+        <a id="fallback-link" href="#">إذا لم يفتح التطبيق، انقر هنا</a>
+    </div>
+
     <script type="text/javascript">
-        window.onload = function() {
+        // 3. منطق التحقق وإعادة التوجيه (JavaScript)
+        async function handleRedirect() {
+            const statusMessage = document.getElementById('status-message');
+            const fallbackLink = document.getElementById('fallback-link');
+            const loader = document.querySelector('.loader');
+
             // استخلاص Gist ID من رابط الصفحة
             const params = new URLSearchParams(window.location.search);
             const gistId = params.get('gist_id');
 
-            if (gistId) {
-                // إنشاء الرابط العميق الخاص بالتطبيق
-                const deepLink = 'think://open?gist_id=' + gistId;
-                // إعادة التوجيه إلى التطبيق
+            if (!gistId) {
+                // إذا لم يكن هناك Gist ID، انتقل إلى صفحة الترحيب
+                window.location.href = 'welcome.html';
+                return;
+            }
+
+            try {
+                // التحقق من صلاحية الرابط عبر استدعاء GitHub API
+                const response = await fetch(`https://api.github.com/gists/${gistId}`);
+                
+                if (!response.ok) {
+                    // إذا كان الرد غير ناجح (404 Not Found, 403 Forbidden, etc.)
+                    // فهذا يعني أن الرابط منتهي الصلاحية أو غير صحيح
+                    throw new Error('Conversation not found or expired.');
+                }
+
+                // إذا كان الرابط صالحًا، قم بإعادة التوجيه إلى التطبيق
+                const deepLink = `think://open?gist_id=${gistId}`;
+                
+                // إعداد الرابط الاحتياطي
+                fallbackLink.href = deepLink;
+                fallbackLink.style.display = 'block';
+                statusMessage.textContent = 'تم التحقق بنجاح! جاري فتح التطبيق...';
+
+                // محاولة إعادة التوجيه التلقائي
                 window.location.href = deepLink;
 
-                // (اختياري) يمكنك إضافة زر احتياطي في حال لم تعمل إعادة التوجيه التلقائي
-                document.getElementById('message').innerHTML = 
-                    'If you are not redirected automatically, <a href="' + deepLink + '">click here to open the app</a>.';
-            } else {
-                document.getElementById('message').innerText = 'No conversation link found.';
+            } catch (error) {
+                // في حالة فشل التحقق (الرابط منتهي أو خطأ في الشبكة)
+                console.error(error);
+                // انتقل إلى صفحة الترحيب
+                window.location.href = 'welcome.html';
             }
-        };
+        }
+
+        // استدعاء الدالة عند تحميل الصفحة
+        window.onload = handleRedirect;
     </script>
-</head>
-<body>
-    <p id="message">Redirecting to the app...</p>
 </body>
 </html>
