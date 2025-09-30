@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- 1. أيقونة الموقع (Favicon) -->
-    link<link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
+   <link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
     <meta property="og:image" content="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icons/icon_thinkapp.png">
     <meta property="og:title" content="Think Ai">
     <meta property="og:description" content="The comprehensive personal assistant "Fast - Free".">
@@ -181,12 +181,15 @@
             <p data-i18n="description"></p>
             
             <!-- 4. زر التحميل المحدث مع أيقونة SVG -->
-            <button class="download-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
-                    <path d="M3.26,2.77C3.57,2.3,4.1,2,4.7,2h14.6c0.6,0,1.13,0.3,1.44,0.77l-7.9,7.9L3.26,2.77z M20.74,10.67L12.84,18.57c-0.4,0.4-1.08,0.4-1.48,0L3.26,10.67l7.9,7.9L20.74,10.67z M2.77,3.26C2.3,3.57,2,4.1,2,4.7v14.6c0,0.6,0.3,1.13,0.77,1.44l7.9-7.9L2.77,3.26z M21.23,20.74c0.47-0.31,0.77-0.84,0.77-1.44V4.7c0-0.6-0.3-1.13-0.77-1.44l-7.9,7.9L21.23,20.74z"/>
-                </svg>
-                <span data-i18n="downloadButton"></span>
-            </button>
+            <!-- زر التحميل باستخدام صورة Google Play -->
+<button class="download-button">
+    <img src="public/assets/icons/icon_google-play.png" 
+         alt="Google Play" 
+         width="24" 
+         height="24"
+         style="display:inline-block;">
+    <span data-i18n="downloadButton"></span>
+</button>
         </div>
 
         <img src="public/assets/icons/app-mockup.png" alt="App Mockup" class="app-mockup" data-i18n-alt="mockupAlt">
