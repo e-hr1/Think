@@ -5,23 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فتح تطبيق Think</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        button {
-            padding: 12px 24px;
-            font-size: 18px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 8px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+        body { text-align:center; font-family:Arial,sans-serif; margin-top:50px; }
+        button { padding:12px 24px; font-size:18px; cursor:pointer; background:#007bff; color:#fff; border:none; border-radius:8px; }
+        button:hover { background:#0056b3; }
     </style>
 </head>
 <body>
@@ -29,19 +15,13 @@
     <button id="openApp">فتح التطبيق</button>
 
     <script>
-        // الرابط المخصص للتطبيق (Custom Scheme)
-        const appScheme = "think://open";
+        const appScheme = "think://open";  // رابط التطبيق
+        const fallbackURL = "https://e-hr1.github.io/Think"; // الموقع البديل
 
-        // الرابط البديل إذا لم يكن التطبيق مثبت
-        const fallbackURL = "https://e-hr1.github.io/Think";
-
-        document.getElementById("openApp").addEventListener("click", function() {
-            // محاولة فتح التطبيق
-            window.location = appScheme;
-
-            // بعد ثانية واحدة، إذا لم يفتح التطبيق، يفتح الموقع
-            setTimeout(() => {
-                window.location = fallbackURL;
+        document.getElementById("openApp").addEventListener("click", () => {
+            window.location = appScheme; // محاولة فتح التطبيق
+            setTimeout(() => {           // إذا لم يفتح بعد ثانية
+                window.location = fallbackURL; // يفتح الموقع
             }, 1000);
         });
     </script>
