@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- تعديل: منع التكبير على أجهزة الموبايل -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Think AI</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Roboto:wght@400;700&display=swap');
@@ -25,13 +26,19 @@
             background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 100%);
             color: var(--text-dark);
             overflow-x: hidden;
+            
+            /* تعديل: منع تحديد النص ومنع تأثير النقر الرمادي على الموبايل */
+            user-select: none; /* منع تحديد النص لمعظم المتصفحات */
+            -webkit-user-select: none; /* لدعم متصفحات WebKit (Safari, Chrome) */
+            -moz-user-select: none; /* لدعم Firefox */
+            -ms-user-select: none; /* لدعم Internet Explorer/Edge */
+            -webkit-tap-highlight-color: transparent; /* جعل تأثير النقر شفافًا */
         }
 
         body[lang="ar"] {
             font-family: 'Cairo', sans-serif;
         }
 
-        /* --- تعديل رئيسي: إضافة تأثير التمويه الزجاجي (Glassmorphism) --- */
         .container {
             position: relative;
             z-index: 1;
@@ -43,15 +50,10 @@
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
-
-            /* تطبيق التمويه الكلاسيكي على الخلفية */
             backdrop-filter: blur(100px);
-            -webkit-backdrop-filter: blur(100px); /* لدعم متصفح Safari */
+            -webkit-backdrop-filter: blur(100px);
         }
-        /* --- نهاية التعديل --- */
 
-
-        /* --- الأشكال المتحركة في الخلفية --- */
         .background-shapes {
             position: absolute;
             top: 0;
@@ -60,7 +62,7 @@
             height: 100%;
             overflow: hidden;
             z-index: 0;
-            filter: url('#gooey-end'); /* تطبيق التأثير المائي مباشرة */
+            filter: url('#gooey-end');
         }
 
         .shape {
@@ -78,17 +80,10 @@
         .shape5 { width: 80px; height: 80px; top: 5%; left: 60%; animation-duration: 22s; }
 
         @keyframes float {
-            from {
-                transform: rotate(0deg) translate(-20px) rotate(0deg) scale(1);
-            }
-            to {
-                transform: rotate(360deg) translate(20px) rotate(-360deg) scale(1.05);
-            }
+            from { transform: rotate(0deg) translate(-20px) rotate(0deg) scale(1); }
+            to { transform: rotate(360deg) translate(20px) rotate(-360deg) scale(1.05); }
         }
-        /* --- نهاية قسم الأشكال --- */
 
-
-        /* ... (باقي الأنماط لم تتغير) ... */
         .header { width: 100%; display: flex; justify-content: space-between; align-items: center; animation: fadeInDown 0.8s ease-out; }
         html[dir="ltr"] .header { justify-content: flex-start; }
         .header .logo { display: flex; align-items: center; gap: 12px; }
@@ -112,10 +107,8 @@
 </head>
 <body>
 
-    <!-- فلاتر SVG للتأثير المائي -->
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
         <defs>
-            <!-- تم حذف الفلتر الابتدائي والاحتفاظ بالنهائي فقط -->
             <filter id="gooey-end">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
                 <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9" result="goo" />
@@ -154,8 +147,17 @@
     </div>
 
     <script>
-        // Javascript لم يتغير
         document.addEventListener('DOMContentLoaded', function() {
+            // --- تعديل: منع النسخ باستخدام JavaScript ---
+            document.addEventListener('contextmenu', event => event.preventDefault()); // منع قائمة النقر بزر الماوس الأيمن
+            document.addEventListener('keydown', event => {
+                // منع Ctrl+C, Ctrl+X, Ctrl+U
+                if (event.ctrlKey && ['c', 'x', 'u'].includes(event.key.toLowerCase())) {
+                    event.preventDefault();
+                }
+            });
+            // --- نهاية التعديل ---
+
             const translations = {
                 en: {
                     pageTitle: "Think Ai",
@@ -202,6 +204,30 @@
                 const toastElement = document.getElementById('toast');
                 toastElement.textContent = t[toastKey];
                 toastElement.className = "toast show";
+                setTimeout(() => { 
+                    toastElement.className = toastElement.className.replace("show", ""); 
+                }, 4000);
+            }
+
+            const downloadButton = document.querySelector('.download-button');
+            downloadButton.addEventListener('click', function() {
+                const deepLink = 'think://open';
+                const playStoreLink = 'https://play.google.com/store/apps/details?id=tech.think.app';
+                
+                const now = new Date().valueOf();
+                setTimeout(function () {
+                    if (new Date().valueOf() - now > 100) return;
+                    window.location.href = playStoreLink;
+                }, 50);
+                
+                window.location.href = deepLink;
+            });
+        });
+    </script>
+
+</body>
+</html>
+t.className = "toast show";
                 setTimeout(() => { 
                     toastElement.className = toastElement.className.replace("show", ""); 
                 }, 4000);
