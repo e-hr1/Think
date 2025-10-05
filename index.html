@@ -28,6 +28,22 @@
     </div>
 
     <script type="text/javascript">
+        // دالة لإرسال طلب مخفي لتشغيل عملية التنظيف في الخلفية
+        function triggerCleanup() {
+            // !!! هام: استبدل الرابط التالي برابط تطبيق الويب الخاص بك من Google Apps Script
+            const cleanupUrl = 'https://script.google.com/macros/s/AKfycbxJY4CkDGFMIqmBnwlSuukVS_ROmk9af8rkhl8JeCkFEvPD5EwfdUgtOZbAuQ_lcVfDsQ/exec'; 
+
+            // navigator.sendBeacon هو أفضل طريقة لإرسال طلبات مخفية لا تؤثر على أداء الصفحة
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(cleanupUrl);
+                console.log("Cleanup process triggered via sendBeacon.");
+            } else {
+                // طريقة بديلة للمتصفحات القديمة
+                fetch(cleanupUrl, { method: 'GET', mode: 'no-cors' }).catch(e => console.error("Fetch fallback for cleanup failed:", e));
+                console.log("Cleanup process triggered via fetch fallback.");
+            }
+        }
+
         // 1. النصوص باللغتين
         const translations = {
             en: {
@@ -79,25 +95,18 @@
                 statusMessage.textContent = t.status_verified;
                 const deepLink = `think://open?gist_id=${gistId}`;
 
-                // *** بداية التعديل ***
-                // متغير لتتبع ما إذا كان يجب إعادة التوجيه
                 let shouldRedirect = true;
-
-                // دالة لإلغاء إعادة التوجيه إذا غادر المستخدم الصفحة (مما يعني أن التطبيق قد فتح)
                 const onBlur = () => {
                     shouldRedirect = false;
                 };
                 window.addEventListener('blur', onBlur);
 
-                // إذا لم يفتح التطبيق بعد 2.5 ثانية، سيتم إعادة التوجيه إلى صفحة الترحيب
                 setTimeout(() => {
-                    // قم بإزالة المستمع لتجنب تسرب الذاكرة
                     window.removeEventListener('blur', onBlur);
                     if (shouldRedirect) {
                         window.location.href = 'welcome.html';
                     }
                 }, 2500);
-                // *** نهاية التعديل ***
 
                 // محاولة فتح الرابط العميق
                 window.location.href = deepLink;
@@ -112,8 +121,12 @@
             }
         }
 
-        // 4. نقطة البداية
+        // 4. نقطة البداية عند تحميل الصفحة
         window.onload = function() {
+            // أولاً: تشغيل عملية التنظيف في الخلفية بشكل مخفي
+            triggerCleanup(); 
+            
+            // ثانياً: تنفيذ المنطق الحالي لتحديد اللغة وإعادة التوجيه
             const selectedTranslations = setLanguage();
             handleRedirect(selectedTranslations);
         };
