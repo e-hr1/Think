@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تحليل كود الخطأ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-primary: #1c1e21;
+            --text-secondary: #65676b;
+            --icon-background: #1c1e21; /* هذا هو اللون الذي سنستخدمه */
+            --border-radius-main: 20px;
+            --border-radius-small: 15px;
+            --primary-color: #007bff;
+            --success-color: #28a745; /* اللون الأخضر السابق */
+            --error-color: #d9534f;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .action-icon, #searchButton {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 100%;
+            height: 100vh;
+            background-color: var(--background-color);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            padding-top: 88px;
+            margin-top: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--background-color);
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 420px;
+            z-index: 20;
+            box-sizing: border-box;
+        }
+
+        .header-info {
+            text-align: right;
+        }
+
+        .header-info h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .header-info p {
+            font-size: 16px;
+            margin: 4px 0 0;
+            color: var(--text-secondary);
+        }
+
+        .action-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-icon img {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.2s;
+        }
+        .action-icon:hover img {
+            transform: scale(1.1);
+        }
+        
+        .main-content-card {
+            background-color: var(--card-background);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            padding: 30px 20px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            height: calc(100vh - 88px);
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: block;
+            text-align: right;
+        }
+        
+        label.input-title {
+            margin-bottom: 10px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--background-color);
+            border-radius: 50px;
+            padding: 8px 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        .text-input {
+            border: none;
+            outline: none;
+            background: none;
+            width: 100%;
+            height: 40px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 16px;
+            color: var(--text-primary);
+            text-align: right;
+        }
+        .text-input::placeholder {
+            color: #9aa0a6;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #searchButton {
+            width: 100%;
+            padding: 16px;
+            /* --- بداية التعديل --- */
+            background-color: var(--icon-background); /* تم تغيير اللون هنا */
+            /* --- نهاية التعديل --- */
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-main);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #searchButton:active {
+            transform: scale(0.98); /* تأثير بسيط عند الضغط */
+        }
+        #searchButton:hover {
+            background-color: #333; /* لون أغمق قليلاً عند المرور بالفأرة */
+        }
+
+        #loading {
+            text-align: center;
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--background-color);
+            border-radius: var(--border-radius-small);
+        }
+        #loading p {
+            margin: 0;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-weight: bold;
+            padding: 15px;
+            background-color: #fddede;
+            border: 1px solid var(--error-color);
+            border-radius: var(--border-radius-small);
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        #results {
+            margin-top: 30px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+        #results h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--background-color);
+            padding-bottom: 10px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        #results ul, #results ol {
+            padding-right: 20px;
+        }
+        #results li {
+            margin-bottom: 12px;
+        }
+        #results strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        #chartContainer {
+            margin-top: 30px;
+            display: none;
+            background: var(--background-color);
+            padding: 15px;
+            border-radius: var(--border-radius-small);
+        }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.1); 
+            transform: scale(0);
+            animation: ripple-effect 0.6s linear;
+            pointer-events: none;
+        }
+        
+        #searchButton .ripple {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes ripple-effect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <header class="header">
+            <div class="header-info">
+                <h1 id="selectedDeviceName">جاري التحميل...</h1>
+                <p>تحليل كود الخطأ</p>
+            </div>
+            <a href="index.html" class="action-icon" aria-label="الرجوع">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxsaW5lIHgxPSI1IiB5MT0iMTIiIHgyPSIxOSIgeTI9IjEyIj48L2xpbmU+PHBvbHlsaW5lIHBvaW50cz0iMTIgNSA1IDEyIDEyIDE5Ij48L3BvbHlsaW5lPjwvc3ZnPg==" alt="Back">
+            </a>
+        </header>
+
+        <main class="main-content-card">
+            
+            <label for="errorCodeInput" class="input-title">أدخل كود الخطأ:</label>
+            <div class="input-container">
+                <input type="text" id="errorCodeInput" class="text-input" placeholder="مثال: E2, F-10, Error 501">
+            </div>
+
+            <label for="manufacturerInput" class="input-title">الشركة المصنعة (اختياري):</label>
+            <div class="input-container">
+                <input type="text" id="manufacturerInput" class="text-input" placeholder="مثال: Siemens, GE, Philips">
+            </div>
+
+            <label for="modelInput" class="input-title">الموديل (اختياري):</label>
+            <div class="input-container">
+                <input type="text" id="modelInput" class="text-input" placeholder="مثال: Somatom, Voluson, iU22">
+            </div>
+            
+            <div class="button-container">
+                <button id="searchButton">تحليل الخطأ</button>
+            </div>
+
+            <div id="loading">
+                <p>جاري تحليل البيانات... الرجاء الانتظار.</p>
+            </div>
+
+            <div id="results"></div>
+
+            <div id="chartContainer">
+                <canvas id="probabilityChart"></canvas>
+            </div>
+
+        </main>
+    </div>
+
+<script>
+// لا يوجد أي تغيير في كود الجافا سكريبت، لذا تم حذفه من هنا للاختصار.
+// يمكنك استخدام نفس الكود الموجود في الرد السابق.
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const clickableElements = document.querySelectorAll('.action-icon, #searchButton');
+    
+    const createRipple = function(event) {
+        const element = this;
+        // عند الضغط على الزر، لا نريد تأثيرين في نفس الوقت
+        if (element.id === 'searchButton' && event.type === 'click') {
+            // لا تفعل شيئًا للسماح لـ :active بالعمل
+        } else {
+            const existingRipple = element.querySelector('.ripple');
+            if (existingRipple) { existingRipple.remove(); }
+            
+            const rect = element.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            const diameter = Math.max(element.clientWidth, element.clientHeight);
+            const radius = diameter / 2;
+            
+            let clientX, clientY;
+            if (event.type === 'touchstart') {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${clientX - rect.left - radius}px`;
+            ripple.style.top = `${clientY - rect.top - radius}px`;
+            ripple.classList.add('ripple');
+            
+            element.appendChild(ripple);
+            
+            ripple.addEventListener('animationend', () => { ripple.remove(); });
+        }
+    };
+
+    clickableElements.forEach(element => {
+        element.addEventListener('click', createRipple);
+        element.addEventListener('touchstart', createRipple, { passive: true });
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const deviceParam = urlParams.get('device');
+    const deviceNameElement = document.getElementById('selectedDeviceName');
+    const chartContainer = document.getElementById('chartContainer');
+    let probabilityChartInstance = null;
+
+    const deviceDisplayNames = {
+        "MRI": "جهاز الرنين المغناطيسي", "CT_Scan": "جهاز التصوير المقطعي", "X-Ray": "جهاز الأشعة السينية",
+        "Ultrasound": "جهاز الموجات فوق الصوتية", "Ventilator": "جهاز التنفس الاصطناعي", "Dialysis_Machine": "جهاز غسيل الكلى",
+        "Defibrillator": "جهاز الصدمات الكهربائية", "Infusion_Pump": "مضخة التسريب الوريدي", "Patient_Monitor": "جهاز مراقبة المريض",
+        "ECG": "جهاز تخطيط القلب", "Pulse_Oximeter": "مقياس التأكسج النبضي", "Blood_Pressure_Monitor": "جهاز قياس ضغط الدم",
+        "Electrosurgical_Unit": "جهاز كي كهربائي", "Surgical_Aspirator": "جهاز شفط جراحي", "Chemistry_Analyzer": "محلل كيمياء الدم",
+        "Centrifuge": "جهاز الطرد المركزي"
+    };
+
+    const deviceName = deviceDisplayNames[deviceParam] || "جهاز غير محدد";
+
+    if (deviceParam) {
+        deviceNameElement.textContent = deviceName;
+    } else {
+        deviceNameElement.textContent = "لم يتم تحديد جهاز!";
+        deviceNameElement.parentElement.style.color = '#d9534f';
+    }
+
+    document.getElementById('searchButton').addEventListener('click', async () => {
+        const errorCode = document.getElementById('errorCodeInput').value.trim();
+        const manufacturer = document.getElementById('manufacturerInput').value.trim();
+        const model = document.getElementById('modelInput').value.trim();
+        
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+        
+        const apiKey = 'AIzaSyCuvhVZ29SmeSNb47JKquBsmUOueKOZ7lk'; 
+
+        if (!deviceParam) {
+            resultsDiv.innerHTML = '<p class="error-message">لم يتم تحديد جهاز. يرجى العودة للصفحة الرئيسية واختيار جهاز أولاً.</p>';
+            return;
+        }
+        if (!errorCode) {
+            resultsDiv.innerHTML = '<p class="error-message">الرجاء إدخال رمز الخطأ.</p>';
+            return;
+        }
+        if (apiKey.includes('YOUR_GEMINI_API_KEY')) {
+            resultsDiv.innerHTML = '<p class="error-message">خطأ: مفتاح API غير مُعد. يرجى تحديث الكود.</p>';
+            return;
+        }
+
+        loadingDiv.style.display = 'block';
+        resultsDiv.innerHTML = '';
+        chartContainer.style.display = 'none';
+
+        if (probabilityChartInstance) {
+            probabilityChartInstance.destroy();
+        }
+
+        let deviceInfo = `لجهاز "${deviceName}"`;
+        if (manufacturer) deviceInfo += ` من شركة "${manufacturer}"`;
+        if (model) deviceInfo += ` موديل "${model}"`;
+
+        const prompt = `أنت خبير صيانة أجهزة طبية. حلل رمز الخطأ "${errorCode}" ${deviceInfo}. قدم إجابة احترافية ودقيقة جداً بالعربية بالتنسيق التالي:
+### تشخيص المشكلة
+(شرح معنى الرمز بشكل محدد للجهاز والموديل إن وجد)
+### الأسباب المحتملة
+* السبب 1: (الاحتمال)% - (شرح)
+* السبب 2: (الاحتمال)% - (شرح)
+### خطوات الحل
+1. الخطوة الأولى (ابدأ بأبسط الحلول)
+2. الخطوة الثانية
+### إجراءات وقائية
+(نصائح لتجنب المشكلة مستقبلاً)`;
+
+        try {
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { "temperature": 0.3 },
+                        safetySettings: [
+                            { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
+                            { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
+                            { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
+                            { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
+                        ]
+                    })
+                }
+            );
+
+            if (!response.ok) throw new Error(`خطأ بالشبكة: ${response.status}`);
+
+            const data = await response.json();
+            if (!data.candidates || data.candidates.length === 0) {
+                throw new Error("لم يتم العثور على إجابة. قد يكون المحتوى محظورًا أو هناك مشكلة في الطلب.");
+            }
+            const rawText = data.candidates[0].content.parts[0].text;
+            
+            const chartData = extractChartData(rawText);
+            if (chartData.labels.length > 0) {
+                chartContainer.style.display = 'block';
+                renderChart(chartData);
+            }
+            
+            resultsDiv.innerHTML = convertMarkdownToHtml(rawText);
+
+        } catch (error) {
+            resultsDiv.innerHTML = `<p class="error-message">حدث خطأ: ${error.message}</p>`;
+        } finally {
+            loadingDiv.style.display = 'none';
+        }
+    });
+
+    function renderChart(chartData) {
+        const ctx = document.getElementById('probabilityChart').getContext('2d');
+        probabilityChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'احتمالية السبب (%)',
+                    data: chartData.values,
+                    backgroundColor: 'rgba(0, 123, 255, 0.7)',
+                    borderColor: 'rgba(0, 123, 255, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'الأسباب الأكثر احتمالاً',
+                        font: { size: 16, family: 'Tajawal' },
+                        color: '#333',
+                        align: 'start',
+                        padding: { bottom: 10 }
+                    }
+                },
+                scales: {
+                    x: { 
+                        beginAtZero: true, 
+                        max: 100,
+                        ticks: { callback: value => value + '%' }
+                    },
+                    y: {
+                        ticks: { font: { family: 'Tajawal' } }
+                    }
+                }
+            }
+        });
+    }
+
+    function extractChartData(text) {
+        const labels = [];
+        const values = [];
+        const causesSection = text.match(/### الأسباب المحتملة\s*([\s\S]*?)(?=\s*###|$)/);
+        if (!causesSection) return { labels, values };
+        const regex = /^\*\s*(.+?):\s*\(?(\d{1,3})\)?%/gm;
+        let match;
+        while ((match = regex.exec(causesSection[1])) !== null) {
+            labels.push(match[1].trim());
+            values.push(parseInt(match[2], 10));
+        }
+        return { labels, values };
+    }
+
+    function convertMarkdownToHtml(text) {
+        let html = text
+            .replace(/### (.*?)(?:\n|$)/g, '<h3>$1</h3>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        html = html.replace(/(\n\*\s.*)+/g, (match) => {
+            const items = match.trim().split('\n').map(item => `<li>${item.replace(/^\*\s*/, '')}</li>`).join('');
+            return `<ul>${items}</ul>`;
+        });
+
+        html = html.replace(/(\n\d+\.\s.*)+/g, (match) => {
+            const items = match.trim().split('\n').map(item => `<li>${item.replace(/^\d+\.\s*/, '')}</li>`).join('');
+            return `<ol>${items}</ol>`;
+        });
+
+        return html;
+    }
+});
+</script>
+
+</body>
+</html>
