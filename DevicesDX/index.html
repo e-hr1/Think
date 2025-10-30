@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>واجهة تطبيق طبي</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-primary: #1c1e21;
+            --text-secondary: #65676b;
+            --icon-background: #1c1e21;
+            --border-radius-main: 20px;
+            --border-radius-small: 15px;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .device-card, .category, .action-icon, .profile, .dialog-button, .privacy-link {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 420px;
+            min-height: 100vh;
+            background-color: transparent;
+            box-sizing: border-box;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--background-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+            max-width: 420px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .scrollable-content {
+            margin-top: 115px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius-small);
+            padding: 5px;
+        }
+
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            text-align: left;
+        }
+
+        .profile-info h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .profile-info p {
+            font-size: 16px;
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        .action-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-container, .categories {
+            transition: opacity 0.3s ease, transform 0.3s ease, height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+            overflow: hidden;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--card-background);
+            border-radius: 50px;
+            padding: 8px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin: 15px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            background: none;
+            width: 100%;
+            height: 40px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 16px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .search-bar input::placeholder {
+            color: #9aa0a6;
+        }
+
+        .search-icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .categories {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius-small);
+            padding: 5px;
+        }
+
+        .category-icon {
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--icon-background);
+            border-radius: 50%;
+        }
+
+        .category-icon img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .category span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .main-content-card {
+            background-color: var(--card-background);
+            border-top-left-radius: 30px;
+            border-top-right-radius: 30px;
+            padding: 30px 20px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            flex-grow: 1;
+            z-index: 5;
+        }
+
+        .devices-section {
+            margin-bottom: 35px;
+        }
+        .devices-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            padding-left: 5px;
+            text-align: right;
+        }
+
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .device-card {
+            background-color: var(--background-color);
+            border-radius: var(--border-radius-main);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #e4e6eb;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .device-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .device-image-placeholder {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: #ffffff;
+            border-radius: var(--border-radius-small);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .device-image-placeholder img {
+            width: 50%;
+            height: 50%;
+        }
+
+        .device-card p {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            line-height: 1.4; 
+        }
+
+        .device-card .english-name {
+            font-size: 13px;
+            color: #8a8d91;
+            margin-top: 2px;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.1);
+            transform: scale(0);
+            animation: ripple-effect 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-effect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        .dialog-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;justify-content:center;align-items:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}.dialog-overlay.show{opacity:1;visibility:visible}.dialog-content{background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:28px;padding:25px;width:80%;max-width:360px;box-shadow:0 8px 32px 0 rgba(31,38,135,.15);text-align:center;transform:scale(.9);transition:transform .3s cubic-bezier(.18,.89,.32,1.28)}.dialog-overlay.show .dialog-content{transform:scale(1)}.dialog-content h2{font-size:22px;font-weight:700;margin-top:0;margin-bottom:15px;color:var(--text-primary)}.dialog-content p{font-size:16px;line-height:1.6;color:#3c3e41;margin-bottom:25px;text-align:right}.dialog-buttons{display:flex;gap:10px}.dialog-button{flex:1;padding:14px 20px;border:none;border-radius:16px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:transform .2s;position:relative;overflow:hidden}.dialog-button:active{transform:scale(.96)}.dialog-button.facebook{background-color:#0866FF;color:#fff}.dialog-button.whatsapp{background-color:#25D366;color:#fff}
+
+        /* بداية الإضافة: تنسيق إضافي لرابط سياسة الخصوصية */
+        .privacy-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative; /* ضروري لعمل تأثير النقر */
+            overflow: hidden;   /* ضروري لعمل تأثير النقر */
+            display: inline-block; /* لضمان أن العنصر يأخذ أبعادًا */
+            padding: 4px 8px; /* مساحة إضافية حول النص لتسهيل النقر */
+            border-radius: 8px; /* حواف دائرية تتناسب مع التأثير */
+        }
+        /* نهاية الإضافة */
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <header class="header">
+            <div class="profile" id="sarah-trigger">
+                <img src="assets/profile.png" alt="Profile Picture" class="profile-pic">
+                <div class="profile-info">
+                    <h1>Al Hussein Mutair</h1>
+                    <p>Biomedical Engineering</p>
+                </div>
+            </div>
+            <div class="action-icon">
+                <img src="assets/share.png" alt="Share Icon">
+            </div>
+        </header>
+
+        <div class="scrollable-content">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="البحث عن جهاز">
+                    <img src="assets/icon_search.png" alt="Search Icon" class="search-icon">
+                </div>
+            </div>
+
+            <div class="categories">
+                <div class="category" id="category-iv-pump">
+                    <div class="category-icon"><img src="assets/iv-pump.png" alt="IV Pumps"></div>
+                    <span>IV Pumps</span>
+                </div>
+                <div class="category" id="category-monitor">
+                    <div class="category-icon"><img src="assets/monitor.png" alt="Monitors"></div>
+                    <span>Monitors</span>
+                </div>
+                <div class="category" id="category-dialysis">
+                    <div class="category-icon"><img src="assets/dialysis.png" alt="Dialysis"></div>
+                    <span>Dialysis</span>
+                </div>
+                <div class="category" id="category-ventilator">
+                    <div class="category-icon"><img src="assets/ventilator.png" alt="Ventilators"></div>
+                    <span>Ventilators</span>
+                </div>
+            </div>
+
+            <main class="main-content-card">
+
+                <section class="devices-section">
+                    <h2 class="section-title">أجهزة التشخيص والتصوير</h2>
+                    <div class="devices-grid">
+                        <a href="analysis.html?device=MRI" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز الرنين المغناطيسي</p>
+                                <p class="english-name">(MRI)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=CT_Scan" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز التصوير المقطعي</p>
+                                <p class="english-name">(CT Scan)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=X-Ray" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز الأشعة السينية</p>
+                                <p class="english-name">(X-Ray)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Ultrasound" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز الموجات فوق الصوتية</p>
+                                <p class="english-name">(Ultrasound)</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="devices-section">
+                    <h2 class="section-title">أجهزة العلاج ودعم الحياة</h2>
+                    <div class="devices-grid">
+                        <a href="analysis.html?device=Ventilator" class="device-card" id="device-ventilator">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز التنفس الاصطناعي</p>
+                                <p class="english-name">(Ventilator)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Dialysis_Machine" class="device-card" id="device-dialysis-machine">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز غسيل الكلى</p>
+                                <p class="english-name">(Dialysis Machine)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Defibrillator" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز الصدمات الكهربائية</p>
+                                <p class="english-name">(Defibrillator)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Infusion_Pump" class="device-card" id="device-infusion-pump">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>مضخة التسريب الوريدي</p>
+                                <p class="english-name">(Infusion Pump)</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="devices-section">
+                    <h2 class="section-title">أجهزة المراقبة</h2>
+                    <div class="devices-grid">
+                        <a href="analysis.html?device=Patient_Monitor" class="device-card" id="device-patient-monitor">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز مراقبة المريض</p>
+                                <p class="english-name">(Patient Monitor)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=ECG" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز تخطيط القلب</p>
+                                <p class="english-name">(ECG)</p>
+                            </div>
+                        </a>
+                         <a href="analysis.html?device=Pulse_Oximeter" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>مقياس التأكسج النبضي</p>
+                                <p class="english-name">(Pulse Oximeter)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Blood_Pressure_Monitor" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز قياس ضغط الدم</p>
+                                <p class="english-name">(Blood Pressure Monitor)</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="devices-section">
+                    <h2 class="section-title">الأجهزة الجراحية</h2>
+                    <div class="devices-grid">
+                        <a href="analysis.html?device=Electrosurgical_Unit" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز كي كهربائي</p>
+                                <p class="english-name">(Electrosurgical Unit)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Surgical_Aspirator" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز شفط جراحي</p>
+                                <p class="english-name">(Surgical Aspirator)</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="devices-section">
+                    <h2 class="section-title">أجهزة المختبرات</h2>
+                    <div class="devices-grid">
+                        <a href="analysis.html?device=Chemistry_Analyzer" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>محلل كيمياء الدم</p>
+                                <p class="english-name">(Chemistry Analyzer)</p>
+                            </div>
+                        </a>
+                        <a href="analysis.html?device=Centrifuge" class="device-card">
+                            <div class="device-image-placeholder"><img src="assets/placeholder.png" alt=""></div>
+                            <div>
+                                <p>جهاز الطرد المركزي</p>
+                                <p class="english-name">(Centrifuge)</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+<div class="dialog-overlay" id="info-dialog-overlay">
+    <div class="dialog-content" dir="rtl" style="text-align: right;">
+        <h2 style="text-align: center;">معلومات التطبيق</h2>
+        
+        <p style="text-align: center;">
+            تطبيق <strong>Devices DX</strong> هو مساعدك الذكي لفهم وتشخيص رموز الأخطاء في الأجهزة الطبية،
+            حيث يمكنك إدخال كود الخطأ ليعرض لك التشخيص الدقيق وأسباب المشكلة والحلول المقترحة بسرعة وسهولة.
+        </p>
+
+        <hr style="margin: 15px 0; opacity: 0.3;">
+
+        <p style="text-align: center; font-size: 14px; color: #555;">
+            تم تطوير هذا التطبيق بواسطة <strong>المهندس Al Hussein Mutair</strong><br>
+            مهندس أجهزة طبية ومبرمج أنظمة ذكية.<br>
+      
+        </p>
+
+        <!-- بداية التعديل -->
+        <p style="text-align: center; margin-top: 0px; margin-bottom: 1px;">
+            <a href="#" class="privacy-link">
+                سياسة الخصوصية
+            </a>
+        </p>
+        <!-- نهاية التعديل -->
+
+        <div class="dialog-buttons" style="direction: ltr; text-align: center;">
+            <button class="dialog-button facebook">Facebook</button>
+            <button class="dialog-button whatsapp">WhatsApp</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // إظهار السنة الحالية تلقائيًا
+    document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // بداية التعديل: إضافة ".privacy-link" إلى القائمة
+            const clickableElements = document.querySelectorAll('.device-card, .category, .action-icon, .profile, .dialog-button, .privacy-link');
+            // نهاية التعديل
+            
+            const createRipple = function(event) {
+                const element = this;
+                const existingRipple = element.querySelector('.ripple');
+                if (existingRipple) { existingRipple.remove(); }
+                const rect = element.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const diameter = Math.max(element.clientWidth, element.clientHeight);
+                const radius = diameter / 2;
+                let clientX, clientY;
+                if (event.type === 'touchstart') {
+                    clientX = event.touches[0].clientX;
+                    clientY = event.touches[0].clientY;
+                } else {
+                    clientX = event.clientX;
+                    clientY = event.clientY;
+                }
+                ripple.style.width = ripple.style.height = `${diameter}px`;
+                ripple.style.left = `${clientX - rect.left - radius}px`;
+                ripple.style.top = `${clientY - rect.top - radius}px`;
+                ripple.classList.add('ripple');
+                element.appendChild(ripple);
+                ripple.addEventListener('animationend', () => { ripple.remove(); });
+            };
+            clickableElements.forEach(element => {
+                element.addEventListener('click', createRipple);
+                element.addEventListener('touchstart', createRipple, { passive: true });
+            });
+            const sarahTrigger = document.getElementById('sarah-trigger');
+            const dialogOverlay = document.getElementById('info-dialog-overlay');
+            const showDialog = function() { dialogOverlay.classList.add('show'); };
+            const hideDialog = function(event) { if (event.target === dialogOverlay) { dialogOverlay.classList.remove('show'); } };
+            sarahTrigger.addEventListener('click', showDialog);
+            dialogOverlay.addEventListener('click', hideDialog);
+            const searchInput = document.getElementById('searchInput');
+            const deviceSections = document.querySelectorAll('.devices-section');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                deviceSections.forEach(section => {
+                    const deviceCards = section.querySelectorAll('.device-card');
+                    const sectionTitle = section.querySelector('.section-title');
+                    let sectionHasVisibleCards = false;
+                    deviceCards.forEach(card => {
+                        const deviceName = card.textContent.toLowerCase();
+                        if (deviceName.includes(searchTerm)) {
+                            card.style.display = 'flex';
+                            sectionHasVisibleCards = true;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    if (sectionTitle) {
+                        if (sectionHasVisibleCards) {
+                            sectionTitle.style.display = 'block';
+                        } else {
+                            sectionTitle.style.display = 'none';
+                        }
+                    }
+                });
+            });
+            function setupCategoryClick(categoryId, deviceCardId) {
+                const categoryElement = document.getElementById(categoryId);
+                const deviceCardElement = document.getElementById(deviceCardId);
+                if (categoryElement && deviceCardElement) {
+                    categoryElement.addEventListener('click', function() {
+                        deviceCardElement.click();
+                    });
+                }
+            }
+            setupCategoryClick('category-iv-pump', 'device-infusion-pump');
+            setupCategoryClick('category-monitor', 'device-patient-monitor');
+            setupCategoryClick('category-dialysis', 'device-dialysis-machine');
+            setupCategoryClick('category-ventilator', 'device-ventilator');
+        });
+    </script>
+
+</body>
+</html>
