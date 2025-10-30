@@ -616,27 +616,29 @@
         setupCategoryClick('category-ventilator', 'device-ventilator');
 
         // *** بداية كود المشاركة المضاف ***
-        const shareButton = document.getElementById('share-button');
-        shareButton.addEventListener('click', async () => {
-            const shareData = {
-                title: 'تطبيق Devices DX',
-                text: 'اكتشف تطبيق Devices DX، دليلك الشامل لتشخيص أعطال الأجهزة الطبية. حمّل التطبيق الآن واحصل على حلول سريعة وموثوقة لرموز الأخطاء.',
-                url: 'https://play.google.com/store/apps/details?id=com.my.devicesDX'
-            };
+        // *** بداية كود المشاركة المعدل ***
+const shareButton = document.getElementById('share-button');
+shareButton.addEventListener('click', () => {
+    const shareData = {
+        title: 'تطبيق Devices DX',
+        text: 'اكتشف تطبيق Devices DX، دليلك الشامل لتشخيص أعطال الأجهزة الطبية. حمّل التطبيق الآن واحصل على حلول سريعة وموثوقة لرموز الأخطاء.',
+        url: 'https://play.google.com/store/apps/details?id=com.my.devicesDX'
+    };
 
-            try {
-                // التحقق مما إذا كان المتصفح يدعم واجهة المشاركة
-                if (navigator.share) {
-                    await navigator.share(shareData);
-                    console.log('تمت المشاركة بنجاح');
-                } else {
-                    // في حالة عدم دعم المتصفح، يمكن عرض رسالة أو نسخ الرابط
-                    alert('المشاركة غير مدعومة في هذا المتصفح. يمكنك نسخ الرابط يدوياً.');
-                }
-            } catch (err) {
-                console.error('خطأ أثناء المشاركة:', err);
-            }
-        });
+    // التحقق مما إذا كان التطبيق يعمل داخل WebView الذي يحتوي على الـ Bridge
+    if (window.AndroidBridge && typeof window.AndroidBridge.shareContent === 'function') {
+        // استدعاء دالة Java مباشرةً
+        window.AndroidBridge.shareContent(shareData.title, shareData.text, shareData.url);
+    } else {
+        // في حالة الفتح من متصفح عادي، استخدم Web Share API
+        if (navigator.share) {
+            navigator.share(shareData).catch(err => console.error('خطأ أثناء المشاركة:', err));
+        } else {
+            alert('المشاركة غير مدعومة في هذا المتصفح.');
+        }
+    }
+});
+
         // *** نهاية كود المشاركة المضاف ***
     });
 </script>
