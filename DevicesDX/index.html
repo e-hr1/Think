@@ -276,7 +276,7 @@
             font-size: 15px;
             font-weight: 500;
             color: var(--text-secondary);
-            line-height: 1.4; 
+            line-height: 1.4;
         }
 
         .device-card .english-name {
@@ -300,36 +300,36 @@
                 opacity: 0;
             }
         }
-        
+
         .dialog-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;justify-content:center;align-items:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}.dialog-overlay.show{opacity:1;visibility:visible}.dialog-content{background:rgba(255,255,255,.7);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:28px;padding:25px;width:80%;max-width:360px;box-shadow:0 8px 32px 0 rgba(31,38,135,.15);text-align:center;transform:scale(.9);transition:transform .3s cubic-bezier(.18,.89,.32,1.28)}.dialog-overlay.show .dialog-content{transform:scale(1)}.dialog-content h2{font-size:22px;font-weight:700;margin-top:0;margin-bottom:15px;color:var(--text-primary)}.dialog-content p{font-size:16px;line-height:1.6;color:#3c3e41;margin-bottom:25px;text-align:right}.dialog-buttons{display:flex;gap:10px}.dialog-button{flex:1;padding:14px 20px;border:none;border-radius:16px;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:transform .2s;position:relative;overflow:hidden}.dialog-button:active{transform:scale(.96)}.dialog-button.facebook{background-color:#0866FF;color:#fff}.dialog-button.whatsapp{background-color:#25D366;color:#fff}
 
-        /* بداية الإضافة: تنسيق إضافي لرابط سياسة الخصوصية */
         .privacy-link {
             color: #007bff;
             text-decoration: none;
             font-size: 14px;
             cursor: pointer;
-            position: relative; /* ضروري لعمل تأثير النقر */
-            overflow: hidden;   /* ضروري لعمل تأثير النقر */
-            display: inline-block; /* لضمان أن العنصر يأخذ أبعادًا */
-            padding: 4px 8px; /* مساحة إضافية حول النص لتسهيل النقر */
-            border-radius: 8px; /* حواف دائرية تتناسب مع التأثير */
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
         }
-        /* نهاية الإضافة */
     </style>
 </head>
 <body>
 
     <div class="mobile-container">
         <header class="header">
-            <div class="profile" id="sarah-trigger">
+            <div class="profile" id="profile-trigger">
                 <img src="assets/profile.png" alt="Profile Picture" class="profile-pic">
                 <div class="profile-info">
                     <h1>Al Hussein Mutair</h1>
                     <p>Biomedical Engineering</p>
                 </div>
             </div>
-            <div class="action-icon">
+            <!-- بداية التعديل: إضافة id لزر المشاركة -->
+            <div class="action-icon" id="share-button">
+            <!-- نهاية التعديل -->
                 <img src="assets/share.png" alt="Share Icon">
             </div>
         </header>
@@ -512,7 +512,7 @@
 <div class="dialog-overlay" id="info-dialog-overlay">
     <div class="dialog-content" dir="rtl" style="text-align: right;">
         <h2 style="text-align: center;">معلومات التطبيق</h2>
-        
+
         <p style="text-align: center;">
             تطبيق <strong>Devices DX</strong> هو مساعدك الذكي لفهم وتشخيص رموز الأخطاء في الأجهزة الطبية،
             حيث يمكنك إدخال كود الخطأ ليعرض لك التشخيص الدقيق وأسباب المشكلة والحلول المقترحة بسرعة وسهولة.
@@ -523,16 +523,13 @@
         <p style="text-align: center; font-size: 14px; color: #555;">
             تم تطوير هذا التطبيق بواسطة <strong>المهندس Al Hussein Mutair</strong><br>
             مهندس أجهزة طبية ومبرمج أنظمة ذكية.<br>
-      
         </p>
 
-        <!-- بداية التعديل -->
         <p style="text-align: center; margin-top: 0px; margin-bottom: 1px;">
             <a href="#" class="privacy-link">
                 سياسة الخصوصية
             </a>
         </p>
-        <!-- نهاية التعديل -->
 
         <div class="dialog-buttons" style="direction: ltr; text-align: center;">
             <button class="dialog-button facebook">Facebook</button>
@@ -542,90 +539,107 @@
 </div>
 
 <script>
-    // إظهار السنة الحالية تلقائيًا
-    document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const clickableElements = document.querySelectorAll('.device-card, .category, .action-icon, .profile, .dialog-button, .privacy-link');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // بداية التعديل: إضافة ".privacy-link" إلى القائمة
-            const clickableElements = document.querySelectorAll('.device-card, .category, .action-icon, .profile, .dialog-button, .privacy-link');
-            // نهاية التعديل
-            
-            const createRipple = function(event) {
-                const element = this;
-                const existingRipple = element.querySelector('.ripple');
-                if (existingRipple) { existingRipple.remove(); }
-                const rect = element.getBoundingClientRect();
-                const ripple = document.createElement('span');
-                const diameter = Math.max(element.clientWidth, element.clientHeight);
-                const radius = diameter / 2;
-                let clientX, clientY;
-                if (event.type === 'touchstart') {
-                    clientX = event.touches[0].clientX;
-                    clientY = event.touches[0].clientY;
-                } else {
-                    clientX = event.clientX;
-                    clientY = event.clientY;
-                }
-                ripple.style.width = ripple.style.height = `${diameter}px`;
-                ripple.style.left = `${clientX - rect.left - radius}px`;
-                ripple.style.top = `${clientY - rect.top - radius}px`;
-                ripple.classList.add('ripple');
-                element.appendChild(ripple);
-                ripple.addEventListener('animationend', () => { ripple.remove(); });
-            };
-            clickableElements.forEach(element => {
-                element.addEventListener('click', createRipple);
-                element.addEventListener('touchstart', createRipple, { passive: true });
-            });
-            const sarahTrigger = document.getElementById('sarah-trigger');
-            const dialogOverlay = document.getElementById('info-dialog-overlay');
-            const showDialog = function() { dialogOverlay.classList.add('show'); };
-            const hideDialog = function(event) { if (event.target === dialogOverlay) { dialogOverlay.classList.remove('show'); } };
-            sarahTrigger.addEventListener('click', showDialog);
-            dialogOverlay.addEventListener('click', hideDialog);
-            const searchInput = document.getElementById('searchInput');
-            const deviceSections = document.querySelectorAll('.devices-section');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                deviceSections.forEach(section => {
-                    const deviceCards = section.querySelectorAll('.device-card');
-                    const sectionTitle = section.querySelector('.section-title');
-                    let sectionHasVisibleCards = false;
-                    deviceCards.forEach(card => {
-                        const deviceName = card.textContent.toLowerCase();
-                        if (deviceName.includes(searchTerm)) {
-                            card.style.display = 'flex';
-                            sectionHasVisibleCards = true;
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                    if (sectionTitle) {
-                        if (sectionHasVisibleCards) {
-                            sectionTitle.style.display = 'block';
-                        } else {
-                            sectionTitle.style.display = 'none';
-                        }
+        const createRipple = function(event) {
+            const element = this;
+            const existingRipple = element.querySelector('.ripple');
+            if (existingRipple) { existingRipple.remove(); }
+            const rect = element.getBoundingClientRect();
+            const ripple = document.createElement('span');
+            const diameter = Math.max(element.clientWidth, element.clientHeight);
+            const radius = diameter / 2;
+            let clientX, clientY;
+            if (event.type === 'touchstart') {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            ripple.style.width = ripple.style.height = `${diameter}px`;
+            ripple.style.left = `${clientX - rect.left - radius}px`;
+            ripple.style.top = `${clientY - rect.top - radius}px`;
+            ripple.classList.add('ripple');
+            element.appendChild(ripple);
+            ripple.addEventListener('animationend', () => { ripple.remove(); });
+        };
+        clickableElements.forEach(element => {
+            element.addEventListener('click', createRipple);
+            element.addEventListener('touchstart', createRipple, { passive: true });
+        });
+
+        // نافذة المعلومات الشخصية
+        const profileTrigger = document.getElementById('profile-trigger');
+        const dialogOverlay = document.getElementById('info-dialog-overlay');
+        const showDialog = function() { dialogOverlay.classList.add('show'); };
+        const hideDialog = function(event) { if (event.target === dialogOverlay) { dialogOverlay.classList.remove('show'); } };
+        profileTrigger.addEventListener('click', showDialog);
+        dialogOverlay.addEventListener('click', hideDialog);
+
+        // وظيفة البحث
+        const searchInput = document.getElementById('searchInput');
+        const deviceSections = document.querySelectorAll('.devices-section');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            deviceSections.forEach(section => {
+                const deviceCards = section.querySelectorAll('.device-card');
+                const sectionTitle = section.querySelector('.section-title');
+                let sectionHasVisibleCards = false;
+                deviceCards.forEach(card => {
+                    const deviceName = card.textContent.toLowerCase();
+                    if (deviceName.includes(searchTerm)) {
+                        card.style.display = 'flex';
+                        sectionHasVisibleCards = true;
+                    } else {
+                        card.style.display = 'none';
                     }
                 });
-            });
-            function setupCategoryClick(categoryId, deviceCardId) {
-                const categoryElement = document.getElementById(categoryId);
-                const deviceCardElement = document.getElementById(deviceCardId);
-                if (categoryElement && deviceCardElement) {
-                    categoryElement.addEventListener('click', function() {
-                        deviceCardElement.click();
-                    });
+                if (sectionTitle) {
+                    sectionTitle.style.display = sectionHasVisibleCards ? 'block' : 'none';
                 }
-            }
-            setupCategoryClick('category-iv-pump', 'device-infusion-pump');
-            setupCategoryClick('category-monitor', 'device-patient-monitor');
-            setupCategoryClick('category-dialysis', 'device-dialysis-machine');
-            setupCategoryClick('category-ventilator', 'device-ventilator');
+            });
         });
-    </script>
+
+        // ربط الفئات بالأجهزة
+        function setupCategoryClick(categoryId, deviceCardId) {
+            const categoryElement = document.getElementById(categoryId);
+            const deviceCardElement = document.getElementById(deviceCardId);
+            if (categoryElement && deviceCardElement) {
+                categoryElement.addEventListener('click', () => deviceCardElement.click());
+            }
+        }
+        setupCategoryClick('category-iv-pump', 'device-infusion-pump');
+        setupCategoryClick('category-monitor', 'device-patient-monitor');
+        setupCategoryClick('category-dialysis', 'device-dialysis-machine');
+        setupCategoryClick('category-ventilator', 'device-ventilator');
+
+        // *** بداية كود المشاركة المضاف ***
+        const shareButton = document.getElementById('share-button');
+        shareButton.addEventListener('click', async () => {
+            const shareData = {
+                title: 'تطبيق Devices DX',
+                text: 'اكتشف تطبيق Devices DX، دليلك الشامل لتشخيص أعطال الأجهزة الطبية. حمّل التطبيق الآن واحصل على حلول سريعة وموثوقة لرموز الأخطاء.',
+                url: 'https://play.google.com/store/apps/details?id=com.my.devicesDX'
+            };
+
+            try {
+                // التحقق مما إذا كان المتصفح يدعم واجهة المشاركة
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                    console.log('تمت المشاركة بنجاح');
+                } else {
+                    // في حالة عدم دعم المتصفح، يمكن عرض رسالة أو نسخ الرابط
+                    alert('المشاركة غير مدعومة في هذا المتصفح. يمكنك نسخ الرابط يدوياً.');
+                }
+            } catch (err) {
+                console.error('خطأ أثناء المشاركة:', err);
+            }
+        });
+        // *** نهاية كود المشاركة المضاف ***
+    });
+</script>
 
 </body>
 </html>
