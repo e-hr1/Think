@@ -6,12 +6,12 @@
 
     <!-- Meta tags for link previews -->
     <link rel="icon" href="public/assets/icons/icon_thinkapp.png" type="image/png">
-    <meta property="og:image" content="https://raw.githubusercontent.com/e-hr1/Aures/main/public/assets/icons/icon_ Thinkapp.png">
-    <meta property="og:title" content="Open in Aures AI App">
-    <meta property="og:description" content="Content shared from the Aures AI app. Click to open in the app.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/e-hr1/Think/main/public/assets/icons/icon_thinkapp.png">
+    <meta property="og:title" content="Open in Think AI App">
+    <meta property="og:description" content="Content shared from the Think AI app. Click to open in the app.">
     <meta name="twitter:card" content="summary">
 
-    <title>Opening in Aures AI...</title>
+    <title>Opening in Think AI...</title>
 
     <style>
         body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f0f2f5; text-align: center; color: #333; transition: opacity 0.5s ease-in-out; opacity: 0; }
@@ -47,14 +47,14 @@
         // 1. النصوص باللغتين
         const translations = {
             en: {
-                title: "Opening in Aures AI...",
+                title: "Opening in Think AI...",
                 status_checking: "Verifying link...",
                 status_verified: "Verified! Attempting to open the app...",
                 no_link_found: "No conversation link found. Redirecting...",
                 link_expired: "Link expired or invalid. Redirecting..."
             },
             ar: {
-                title: "الفتح في Aures AI...",
+                title: "الفتح في Think AI...",
                 status_checking: "جاري التحقق من الرابط...",
                 status_verified: "تم التحقق! جاري محاولة فتح التطبيق...",
                 no_link_found: "لم يتم العثور على رابط محادثة. جاري إعادة التوجيه...",
@@ -93,7 +93,7 @@
                 }
 
                 statusMessage.textContent = t.status_verified;
-                const deepLink = `Aures://open?gist_id=${gistId}`;
+                const deepLink = `think://open?gist_id=${gistId}`;
 
                 let shouldRedirect = true;
                 const onBlur = () => {
